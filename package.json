@@ -1,0 +1,27 @@
+{
+  "name": "pomodoro",
+  "version": "1.0.0",
+  "description": "Pomodoro Timer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/u-iDaniel/pomodoro.git#artheinian_ramos"
+  },
+  "author": "Artheinian Ramos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/u-iDaniel/pomodoro/issues"
+  },
+  "homepage": "https://github.com/u-iDaniel/pomodoro/tree/artheinian_ramos#readme",
+  "dependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.2",
+    "tailwindcss": "^4.0.6"
+  }
+}
