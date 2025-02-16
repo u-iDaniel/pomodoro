@@ -7,7 +7,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Button from '@mui/material/Button';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import UserLogin from './UserLogin';
 
 import "@fontsource/montserrat";
 
@@ -31,14 +31,8 @@ export default function Navbar({title}) {
           sx={{fontFamily: 'Montserrat, Arial, sans', textTransform: 'none', fontSize: '1.5rem'}}>
             settings
           </Button>
-
-     
-          <Button color="inherit" startIcon={<AccountCircleIcon />} 
-          sx={{fontFamily: 'Montserrat, Arial, sans', textTransform: 'none', fontSize: '1.5rem' }} >
-            login/register
-          </Button>
+          <UserLogin />
         </Box>
-
     </Toolbar>
   </AppBar>
 }
