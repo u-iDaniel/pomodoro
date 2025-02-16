@@ -2,7 +2,6 @@
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -11,7 +10,7 @@ import UserLogin from './UserLogin';
 
 import "@fontsource/montserrat";
 
-export default function Navbar({title}) {
+export default function Navbar({title} : {title: string}) {
 
   return <AppBar position="static" sx={{ backgroundColor: "white", color: "black", }} >
     <Toolbar sx={{mt: 2, mb: 2}}>    

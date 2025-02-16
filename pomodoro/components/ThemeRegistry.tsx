@@ -4,6 +4,10 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { createContext, useContext, useEffect, useState } from 'react';
 import { theme, darkTheme } from "../theme/theme";
+import { CacheProvider } from "@emotion/react";
+import createCache from "@emotion/cache";
+
+const cssCache = createCache({ key: "css", prepend: true });
 
 type ThemeContextType = {
   isDarkMode: boolean;
@@ -30,10 +34,12 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-      <ThemeProvider theme={isDarkMode ? darkTheme : theme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
+      <CacheProvider value={cssCache}>
+        <ThemeProvider theme={isDarkMode ? darkTheme : theme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
+      </CacheProvider>
     </ThemeContext.Provider>
   );
 }
