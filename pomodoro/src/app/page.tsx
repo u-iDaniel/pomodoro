@@ -1,14 +1,14 @@
 import Image from "next/image";
 
-import Navbar from "../../components/Navbar";
+import Timer from "../../components/Timer";
 
 export default function Home() {
   return (
     <div >
       <main >
-        <h1>Welcome to the Home Page!</h1>
+        <Timer 
+        />
       </main>
-      
     </div>
   );
 }
