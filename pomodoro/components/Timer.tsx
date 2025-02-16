@@ -8,13 +8,15 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid2';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function Timer() {
     const [timeLeft, setTimeLeft] = useState(25 * 60);
     const [isActive, setIsActive] = useState(false);
     const [activeButton, setActiveButton] = useState("pomodoro"); 
     const [pomodoroCount, setPomodoroCount] = useState(0);  
-
+    const { data: session } = useSession();
 
     useEffect(() => {
       // Request permission for notifications when the component mounts
@@ -168,9 +170,16 @@ export default function Timer() {
               {isActive ? "pause" : "start"}
             </Button>
         
+        {session ? 
+          (
+            ""
+          )
+          : 
+          (
             <Typography variant="body1" component="div" sx={{ mt: 8, mb: 2 }}>
-              want AI personalized break recommendations? sign up
-        </Typography>
+              want AI personalized break recommendations? <Link className="underline" href={"/login"}>sign up</Link>
+            </Typography>
+          )}
     </Box>
   );
 }
