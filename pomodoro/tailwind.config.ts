@@ -11,6 +11,10 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        secondary: "var(--secondary)",
+        tertiary: "var(--tertiary)",
+        success: "var(--success)",
+        warning: "var(--warning)",
       },
     },
   },
