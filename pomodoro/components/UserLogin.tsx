@@ -34,19 +34,24 @@ export default function UserLogin() {
   return (
     session ? (
       <>
+      <div className="flex items-center gap-4">
+        <p>{session.user?.name}</p>
         <Avatar 
           src={session.user?.image ?? undefined} 
           alt={session.user?.name ?? 'User avatar'}
           onClick={handleClick}
-          sx={{ cursor: 'pointer' }}
+          sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         />
-        <Menu
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-        >
-          <MenuItem onClick={handleSignOut}>sign out</MenuItem>
-        </Menu>
+      </div>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+      >
+        {/* TODO: route to questionaire form */}
+        <MenuItem>edit preferences</MenuItem>
+        <MenuItem onClick={handleSignOut}>sign out</MenuItem>
+      </Menu>
       </>
     ) : (
       <Button onClick={handleLogin} color="inherit" startIcon={<AccountCircleIcon />}
