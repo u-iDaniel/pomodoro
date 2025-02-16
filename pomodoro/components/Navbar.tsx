@@ -11,7 +11,11 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 
 import "@fontsource/montserrat";
 
-export default function Navbar({title}) {
+interface NavbarProps {
+  title: string; 
+}
+
+export default function Navbar({title}: NavbarProps) {
 
   return <AppBar position="static" sx={{ backgroundColor: "white", color: "black", }} >
     <Toolbar sx={{mt: 2, mb: 2}}>    
