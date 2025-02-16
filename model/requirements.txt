@@ -1,0 +1,5 @@
+Flask==3.1.0
+torch==2.6.0 # originally 2.5.1 but I couldn't get it to donwload
+numpy==1.26.4
+pandas==2.2.2
+transformers==4.48.3
