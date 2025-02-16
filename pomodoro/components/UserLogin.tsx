@@ -26,6 +26,11 @@ export default function UserLogin() {
     setAnchorEl(null);
   };
 
+  const handleEditPreferences = () => {
+    router.push("/form");
+    handleClose();
+  }
+
   const handleSignOut = () => {
     signOut();
     handleClose();
@@ -48,8 +53,7 @@ export default function UserLogin() {
         open={open}
         onClose={handleClose}
       >
-        {/* TODO: route to questionaire form */}
-        <MenuItem>edit preferences</MenuItem>
+        <MenuItem onClick={handleEditPreferences}>edit preferences</MenuItem>
         <MenuItem onClick={handleSignOut}>sign out</MenuItem>
       </Menu>
       </>
