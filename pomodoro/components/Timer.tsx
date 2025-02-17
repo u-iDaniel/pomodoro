@@ -8,6 +8,7 @@
   import PlayArrowIcon from "@mui/icons-material/PlayArrow";
   import PauseIcon from "@mui/icons-material/Pause";
   import Dialog from "./Dialog"; 
+  import { useSession } from "next-auth/react";
 
   // import Modal from "@mui/material/Modal";
 import Slide from "@mui/material/Slide"
@@ -51,6 +52,7 @@ import Slide from "@mui/material/Slide"
 
     // const { pomodoroTime, shortBreakTime, longBreakTime, setPomodoroTime, setShortBreakTime, setLongBreakTime } = useTimer();  // Use the context values
 
+    const { data: session } = useSession();
     const [timeLeft, setTimeLeft] = useState(getPomodoroTime() * 60);
     const [isActive, setIsActive] = useState(false);
     const [activeButton, setActiveButton] = useState("pomodoro");
@@ -277,9 +279,19 @@ import Slide from "@mui/material/Slide"
           {isActive ? "pause" : "start"}
         </Button>
 
-        <Typography variant="body1" component="div" sx={{ mt: 8, mb: 2 }}>
-          want AI personalized break recommendations? sign up
-        </Typography>
+        {session ? 
+          (
+            ""
+          )
+          : 
+          (
+            <Typography variant="body1" component="div" sx={{ mt: 8, mb: 2 }}>
+              want AI personalized break recommendations? <Link className="underline" href={"/login"}>sign up</Link>
+            </Typography>
+          )}
+    </Box>
+  );
+}
 
         <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} onSave={handleSave} />
 
@@ -310,5 +322,4 @@ import Slide from "@mui/material/Slide"
       </Box>
     );
   }
-
 
