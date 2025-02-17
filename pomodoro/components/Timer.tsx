@@ -9,6 +9,9 @@
   import PauseIcon from "@mui/icons-material/Pause";
   import Dialog from "./Dialog"; 
 
+  // import Modal from "@mui/material/Modal";
+import Slide from "@mui/material/Slide"
+
   import { useTimer } from "@/components/TimerContext"; 
 
   interface TimerProps {
@@ -53,19 +56,29 @@
     const [activeButton, setActiveButton] = useState("pomodoro");
     const [pomodoroCount, setPomodoroCount] = useState(0);
     const [settingsOpen, setSettingsOpen] = useState(false);
-
+    // const [modalOpen, setModalOpen] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     // New states to hold updated times from DialogComponent
     const [pomodoroTime, setPomodoroTime] = useState(getPomodoroTime());
     const [shortBreakTime, setShortBreakTime] = useState(getShortBreakTime());
     const [longBreakTime, setLongBreakTime] = useState(getLongBreakTime());
-
-
+    
+    
     useEffect(() => {
       if (Notification.permission !== "granted") {
         Notification.requestPermission();
       }
     }, []);
-
+    
+    useEffect(() => {
+      if (dropdownOpen) {
+        const timer = setTimeout(() => {
+          setDropdownOpen(false); 
+        }, 20000);
+        return () => clearTimeout(timer);
+      }
+    }, [dropdownOpen]);
+   
     useEffect(() => {
       let interval: NodeJS.Timeout;
 
@@ -75,7 +88,8 @@
         }, 1000);
       } else if (timeLeft === 0) {
         setIsActive(false);
-
+        // setModalOpen(true);
+        setDropdownOpen(true);
         if (activeButton === "pomodoro") {
           setPomodoroCount((prevCount) => {
             const newCount = prevCount + 1;
@@ -107,7 +121,6 @@
         }
       }
 
-     
 
       return () => clearInterval(interval);
     }, [isActive, timeLeft, activeButton, pomodoroTime, shortBreakTime, longBreakTime]);
@@ -269,6 +282,31 @@
         </Typography>
 
         <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} onSave={handleSave} />
+
+        <Slide direction="up" in={dropdownOpen} mountOnEnter unmountOnExit>
+      <Box
+        sx={{
+          position: "fixed",
+          top: "82%", 
+          right: "5%",
+          width: 250,
+          bgcolor: "#8421DE",
+          p: 2,
+          borderRadius: 2,
+          boxShadow: 3,
+          color: "white",
+        }}
+      >
+        <Typography variant="h6" fontWeight="bold">break time! 🎉</Typography>
+        <Typography variant="body1">
+          {activeButton === "pomodoro" ? "break is over, back to work!" : "Time for a short break!"}
+        </Typography>
+        <Button onClick={() => setDropdownOpen(false)} variant="contained" sx={{ mt: 1, backgroundColor: "#673AB7" }}>
+          OK
+        </Button>
+      </Box>
+    </Slide>
+
       </Box>
     );
   }
