@@ -6,6 +6,9 @@ import CssBaseline from '@mui/material/CssBaseline'
 import Navbar from '@/components/Navbar'
 import "./globals.css";
 import { useEffect, useState } from 'react';
+import { TimerProvider } from '@/components/TimerContext';
+
+
 
 interface RootLayoutClientProps {
   children: React.ReactNode
@@ -13,6 +16,9 @@ interface RootLayoutClientProps {
 
 export default function RootLayoutClient({ children }: RootLayoutClientProps) {
   const [mounted, setMounted] = useState(false);
+
+  const handleSettingsSave = (pomodoro: number, shortBreak: number, longBreak: number) => {
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -24,8 +30,11 @@ export default function RootLayoutClient({ children }: RootLayoutClientProps) {
     <ThemeRegistry>
       <SessionProvider refetchOnWindowFocus={false}>
         <CssBaseline />
-        <Navbar title="pomoAI" />
+          <TimerProvider>
+        <Navbar title="pomoAI" titleHref="/" onSettingsSave={handleSettingsSave}
+               />
         {children}
+        </TimerProvider>
       </SessionProvider>
     </ThemeRegistry>
   )
