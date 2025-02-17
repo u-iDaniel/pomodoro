@@ -67,3 +67,27 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Processing error" }, { status: 500 });
     }
 }
+
+export async function GET() {
+    const session = await auth();
+
+    if (!session?.user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+        const preference = await prisma.preference.findFirst({
+            where: {
+                userid: session.user.id!,
+            },
+            orderBy: {
+                taskid: 'desc'
+            }
+        });
+
+        return NextResponse.json({ preference }, { status: 200 });
+    } catch (error) {
+        console.error("Error fetching preference:", error);
+        return NextResponse.json({ error: "Database error" }, { status: 500 });
+    }
+}
