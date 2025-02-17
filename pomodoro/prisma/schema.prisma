@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model preference {
+  taskid           String  @id @default(uuid()) @db.Uuid
+  userid           String  @db.Uuid
+  preferencetype   String  @db.VarChar(255)
+  preferencedetail String?
+  users            users   @relation(fields: [userid], references: [userid], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model users {
+  userid      String       @id @default(uuid()) @db.Uuid
+  googleemail String       @unique @db.VarChar(255)
+  imageicon   String?      @db.VarChar(255)
+  name        String       @db.VarChar(255)
+  preference  preference[]
+}

@@ -2,6 +2,12 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Run these prerequisite commands to install necessary dependencies + set up Prisma ORM 
+```bash
+npm install
+npx prisma generate
+```
+
 First, run the development server:
 
 ```bash
