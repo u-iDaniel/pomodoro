@@ -1,2 +1,2 @@
-# pomodoro
-HackED 2025
+# pomoAI
+HackED 2025: A Pomodoro timer web app with an AI break recommendation system.
