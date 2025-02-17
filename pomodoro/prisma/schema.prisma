@@ -12,6 +12,8 @@ model preference {
   userid           String  @db.Uuid
   preferencetype   String  @db.VarChar(255)
   preferencedetail String?
+  predictedGenre   String? @db.VarChar(255)
+  spotifyTrackId   String? @db.VarChar(255)
   users            users   @relation(fields: [userid], references: [userid], onDelete: Cascade, onUpdate: NoAction)
 }
 
