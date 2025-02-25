@@ -8,12 +8,12 @@ interface TimerContextType {
   timeLeft: number;
   isActive: boolean;
   currentMode: "pomodoro" | "shortBreak" | "longBreak";
-  setPomodoroTime: (value: number) => void;
-  setShortBreakTime: (value: number) => void;
-  setLongBreakTime: (value: number) => void;
+  setPomodoroTime: (value: number | ((prev: number) => number)) => void;
+  setShortBreakTime: (value: number | ((prev: number) => number)) => void;
+  setLongBreakTime: (value: number | ((prev: number) => number)) => void;
   setMode: (mode: "pomodoro" | "shortBreak" | "longBreak") => void;
-  setIsActive: (active: boolean) => void;
-  setTimeLeft: (time: number) => void;
+  setIsActive: (value: boolean | ((prev: boolean) => boolean)) => void;
+  setTimeLeft: (value: number | ((prev: number) => number)) => void;
 }
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
@@ -55,11 +55,13 @@ export const TimerProvider = ({ children }: { children: React.ReactNode }) => {
     setIsActive(false);
   };
 
-  // Save to localStorage when values change
+  // Save to localStorage effect
   useEffect(() => {
-    localStorage.setItem("pomodoroTime", pomodoroTime.toString());
-    localStorage.setItem("shortBreakTime", shortBreakTime.toString());
-    localStorage.setItem("longBreakTime", longBreakTime.toString());
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("pomodoroTime", pomodoroTime.toString());
+      localStorage.setItem("shortBreakTime", shortBreakTime.toString());
+      localStorage.setItem("longBreakTime", longBreakTime.toString());
+    }
   }, [pomodoroTime, shortBreakTime, longBreakTime]);
 
   return (

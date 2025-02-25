@@ -17,9 +17,6 @@ interface RootLayoutClientProps {
 export default function RootLayoutClient({ children }: RootLayoutClientProps) {
   const [mounted, setMounted] = useState(false);
 
-  const handleSettingsSave = (pomodoro: number, shortBreak: number, longBreak: number) => {
-  };
-
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -31,9 +28,8 @@ export default function RootLayoutClient({ children }: RootLayoutClientProps) {
       <SessionProvider refetchOnWindowFocus={false}>
         <CssBaseline />
           <TimerProvider>
-        <Navbar title="pomoAI" titleHref="/" onSettingsSave={handleSettingsSave}
-               />
-        {children}
+            <Navbar title="pomoAI" titleHref="/"/>
+            {children}
         </TimerProvider>
       </SessionProvider>
     </ThemeRegistry>
