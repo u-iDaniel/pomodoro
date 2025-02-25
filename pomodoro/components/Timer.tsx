@@ -13,12 +13,6 @@ import Slide from "@mui/material/Slide"
 import { useTimer } from "@/components/TimerContext"; 
 import Link from 'next/link';
 
-interface TimerProps {
-  pomodoroTime: number;
-  shortBreakTime: number;
-  longBreakTime: number;
-}
-
 interface UserPreference {
   predictedGenre: string;
   spotifyTrackId: string;
@@ -36,11 +30,9 @@ export default function Timer() {
     pomodoroTime,
     shortBreakTime,
     longBreakTime,
-    setPomodoroTime,
-    setShortBreakTime,
-    setLongBreakTime
   } = useTimer();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pomodoroCount, setPomodoroCount] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);

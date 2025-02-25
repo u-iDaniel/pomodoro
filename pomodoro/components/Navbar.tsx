@@ -10,7 +10,6 @@ import UserLogin from './UserLogin';
 import { useState } from 'react';
 import Dialog from './Dialog'; 
 import Link from 'next/link';
-import MuiLink from '@mui/material/Link';
 import { useTimer } from '@/components/TimerContext';
 
 import "@fontsource/montserrat";
