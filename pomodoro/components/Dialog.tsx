@@ -20,28 +20,41 @@ import TextField from '@mui/material/TextField';
 interface DialogComponentProps {
   open: boolean;
   onClose: () => void;
-  onSave: (pomodoro: number, shortBreak: number, longBreak: number) => void;
+  onSave?: (pomodoro: number, shortBreak: number, longBreak: number) => void;
 }
 
 const DialogComponent: FC<DialogComponentProps> = ({ open, onClose, onSave }) => {
-
-    const [pomodoro, setPomodoro] = useState(localStorage.getItem("pomodoroTime") || "25");
-    const [shortBreak, setShortBreak] = useState(localStorage.getItem("shortBreakTime") || "5");
-    const [longBreak, setLongBreak] = useState(localStorage.getItem("longBreakTime") || "10");
+    const [pomodoro, setPomodoro] = useState(() => {
+      const stored = localStorage.getItem("pomodoroTime");
+      return stored ? String(Math.floor(Number(stored) / 60)) : "25";
+    });
+    
+    const [shortBreak, setShortBreak] = useState(() => {
+      const stored = localStorage.getItem("shortBreakTime");
+      return stored ? String(Math.floor(Number(stored) / 60)) : "5";
+    });
+    
+    const [longBreak, setLongBreak] = useState(() => {
+      const stored = localStorage.getItem("longBreakTime");
+      return stored ? String(Math.floor(Number(stored) / 60)) : "15";
+    });
   
     const handleSave = () => {
       const pomodoroNum = Number(pomodoro);
       const shortBreakNum = Number(shortBreak);
       const longBreakNum = Number(longBreak);
   
-      localStorage.setItem("pomodoroTime", String(pomodoroNum));
-      localStorage.setItem("shortBreakTime", String(shortBreakNum));
-      localStorage.setItem("longBreakTime", String(longBreakNum));
+      // Store values in minutes in localStorage
+      localStorage.setItem("pomodoroTime", String(pomodoroNum * 60));
+      localStorage.setItem("shortBreakTime", String(shortBreakNum * 60));
+      localStorage.setItem("longBreakTime", String(longBreakNum * 60));
   
-      onSave(pomodoroNum, shortBreakNum, longBreakNum);
+      if (onSave) {
+        onSave(pomodoroNum, shortBreakNum, longBreakNum);
+      }
       onClose();
     };
-  
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogActions sx={{backgroundColor: "white", color: "#000000"}}>
@@ -67,31 +80,46 @@ const DialogComponent: FC<DialogComponentProps> = ({ open, onClose, onSave }) =>
             <List sx={{display: "flex"}}>
                 <ListItem sx={{display: "block", padding: "0"}}>
                     <ListItemText primary="pomodoro"/>
-                    <TextField type='number' variant='filled' value={pomodoro} onChange={(e) => setPomodoro(e.target.value)}
-                    sx={{
+                    <TextField 
+                      type='number' 
+                      variant='filled' 
+                      value={pomodoro}
+                      onChange={(e) => setPomodoro(e.target.value)}
+                      sx={{
                         '& .MuiInputBase-root': { color: '#000000' },
                         '& .MuiFilledInput-root': { backgroundColor: '#E5E5E5'},
                         width: "100px"
-                    }} />
+                      }} 
+                    />
                 </ListItem>
 
                 <ListItem sx={{display: "block", padding: "0"}}>
                     <ListItemText primary="short break"/>
-                    <TextField type='number' variant='filled' value={shortBreak} onChange={(e) => setShortBreak(e.target.value)}
-                    sx={{
+                    <TextField 
+                      type='number' 
+                      variant='filled' 
+                      value={shortBreak}
+                      onChange={(e) => setShortBreak(e.target.value)}
+                      sx={{
                         '& .MuiInputBase-root': { color: '#000000' },
                         '& .MuiFilledInput-root': { backgroundColor: '#E5E5E5'},
                         width: "100px"
-                    }} />
+                      }} 
+                    />
                 </ListItem>
                 <ListItem sx={{display: "block", padding: "0"}}>
                     <ListItemText primary="long break"/>
-                    <TextField type='number' variant='filled' value={longBreak} onChange={(e) => setLongBreak(e.target.value)}
-                    sx={{
+                    <TextField 
+                      type='number' 
+                      variant='filled' 
+                      value={longBreak}
+                      onChange={(e) => setLongBreak(e.target.value)}
+                      sx={{
                         '& .MuiInputBase-root': { color: '#000000' },
                         '& .MuiFilledInput-root': { backgroundColor: '#E5E5E5'},
                         width: "100px"
-                    }} />
+                      }} 
+                    />
                 </ListItem>
             </List>
 

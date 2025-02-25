@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -24,45 +24,26 @@ interface UserPreference {
   spotifyTrackId: string;
 }
 
-function getPomodoroTime(): number {
-  const pomodoroTime = localStorage.getItem("pomodoroTime")
-  if(pomodoroTime === null) {
-    return 25
-  } else {
-    return Number(pomodoroTime)
-  }
-}
-
-function getShortBreakTime() : number {
-  const shortBreakTime = localStorage.getItem("shortBreakTime")
-  if(shortBreakTime === null) {
-    return 5
-  } else {
-    return Number(shortBreakTime)
-  }
-}
-
-function getLongBreakTime(): number {
-  const longBreakTime = localStorage.getItem("longBreakTime")
-  if(longBreakTime === null) {
-    return 10
-  } else {
-    return Number(longBreakTime)
-  }
-}
-
 export default function Timer() {
-
   const { data: session } = useSession();
-  const [timeLeft, setTimeLeft] = useState(getPomodoroTime() * 60);
-  const [isActive, setIsActive] = useState(false);
-  const [activeButton, setActiveButton] = useState("pomodoro");
+  const {
+    timeLeft,
+    setTimeLeft,
+    isActive,
+    setIsActive,
+    currentMode,
+    setMode,
+    pomodoroTime,
+    shortBreakTime,
+    longBreakTime,
+    setPomodoroTime,
+    setShortBreakTime,
+    setLongBreakTime
+  } = useTimer();
+
   const [pomodoroCount, setPomodoroCount] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [pomodoroTime, setPomodoroTime] = useState(getPomodoroTime());
-  const [shortBreakTime, setShortBreakTime] = useState(getShortBreakTime());
-  const [longBreakTime, setLongBreakTime] = useState(getLongBreakTime());
   const [userPreference, setUserPreference] = useState<UserPreference | null>(null);
   const [hasBeenAcknowledged, setHasBeenAcknowledged] = useState(true);
 
@@ -71,17 +52,6 @@ export default function Timer() {
       Notification.requestPermission();
     }
   }, []);
-  
-  /*
-  useEffect(() => {
-    if (dropdownOpen) {
-      const timer = setTimeout(() => {
-        setDropdownOpen(false); 
-      }, 20000);
-      return () => clearTimeout(timer);
-    }
-  }, [dropdownOpen]);
-  */
 
   useEffect(() => {
     if (session?.user) {
@@ -101,52 +71,64 @@ export default function Timer() {
       };
       fetchPreferences();
     }
-  }, [session]);
- 
+  }, [session, setUserPreference]);
+
+  // Move timer completion logic to a separate function
+  const handleTimerComplete = useCallback(() => {
+    setIsActive(false);
+    setDropdownOpen(true);
+    setHasBeenAcknowledged(false);
+
+    if (currentMode === "pomodoro") {
+      setPomodoroCount((prevCount) => {
+        const newCount = prevCount + 1;
+        if (newCount === 4) {
+          sendNotification("you have done 4 pomodoros, take a long break!");
+          setTimeLeft(longBreakTime);
+          setMode("longBreak");
+          playSound();
+          return 0;
+        } else {
+          sendNotification("pomodoro complete! take a short break.");
+          setTimeLeft(shortBreakTime);
+          setMode("shortBreak");
+          playSound();
+          return newCount;
+        }
+      });
+    } else if (currentMode === "shortBreak") {
+      sendNotification("short break is over! time to start a pomodoro.");
+      setTimeLeft(pomodoroTime);
+      setMode("pomodoro");
+      playSound();
+    } else if (currentMode === "longBreak") {
+      sendNotification("long break is over! time to start a pomodoro.");
+      setTimeLeft(pomodoroTime);
+      setPomodoroCount(0);
+      setMode("pomodoro");
+      playSound();
+    }
+  }, [currentMode, longBreakTime, shortBreakTime, pomodoroTime, setTimeLeft, setMode, setPomodoroCount, setIsActive, setDropdownOpen, setHasBeenAcknowledged]);
+
+  // Add a new effect to handle timer completion
+  useEffect(() => {
+    if (timeLeft === 0 && !dropdownOpen && hasBeenAcknowledged) {
+      handleTimerComplete();
+    }
+  }, [timeLeft, dropdownOpen, hasBeenAcknowledged, handleTimerComplete]);
+
+  // Update the timer effect to only handle countdown
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1);
+        setTimeLeft(timeLeft - 1);
       }, 1000);
-    } else if (timeLeft === 0 && hasBeenAcknowledged) {
-      setIsActive(false);
-      setDropdownOpen(true);
-      setHasBeenAcknowledged(false);
-      if (activeButton === "pomodoro") {
-        setPomodoroCount((prevCount) => {
-          const newCount = prevCount + 1;
-          if (newCount === 4) {
-            sendNotification("you have done 4 pomodoros, take a long break!");
-            setTimeLeft(longBreakTime * 60);
-            setActiveButton("long break");
-            playSound();
-            return 0;
-          } else {
-            sendNotification("pomodoro complete! take a short break.");
-            setTimeLeft(shortBreakTime * 60);
-            setActiveButton("short break");
-            playSound();
-            return newCount;
-          }
-        });
-      } else if (activeButton === "short break") {
-        sendNotification("short break is over! time to start a pomodoro.");
-        setTimeLeft(pomodoroTime * 60);
-        setActiveButton("pomodoro");
-        playSound();
-      } else if (activeButton === "long break") {
-        sendNotification("long break is over! time to start a pomodoro.");
-        setTimeLeft(pomodoroTime * 60);
-        setPomodoroCount(0);
-        setActiveButton("pomodoro");
-        playSound();
-      }
     }
 
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, activeButton, pomodoroTime, shortBreakTime, longBreakTime, hasBeenAcknowledged]);
+  }, [isActive, timeLeft, setTimeLeft]);
 
   const timeFormat = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -156,24 +138,24 @@ export default function Timer() {
 
   const pomodoroTimer = () => {
     setIsActive(false);
-    setTimeLeft(pomodoroTime * 60);
-    setActiveButton("pomodoro");
+    setTimeLeft(pomodoroTime);
+    setMode("pomodoro");
   };
 
   const toggleTimer = () => {
-    setIsActive((prev) => !prev);
+    setIsActive(!isActive);
   };
 
   const toggleShortBreak = () => {
     setIsActive(false);
-    setTimeLeft(shortBreakTime * 60);
-    setActiveButton("short break");
+    setTimeLeft(shortBreakTime);
+    setMode("shortBreak");
   };
 
   const toggleLongBreak = () => {
     setIsActive(false);
-    setTimeLeft(longBreakTime * 60);
-    setActiveButton("long break");
+    setTimeLeft(longBreakTime);
+    setMode("longBreak");
   };
 
   const sendNotification = (message: string) => {
@@ -187,36 +169,6 @@ export default function Timer() {
     sound.play().catch((error) => {
       console.error("Audio playback failed:", error);
     });
-  };
-
-  const handleSave = (pomodoro: number, shortBreak: number, longBreak: number) => {
-    setPomodoroTime(pomodoro);
-    setShortBreakTime(shortBreak);
-    setLongBreakTime(longBreak);
-    
-    localStorage.setItem("pomodoroTime", String(pomodoro));
-    localStorage.setItem("shortBreakTime", String(shortBreak));
-    localStorage.setItem("longBreakTime", String(longBreak));
-  
-    if (isActive) {
-      setIsActive(false);
-  
-      if (activeButton === "pomodoro") {
-        setTimeLeft(pomodoro * 60); 
-      } else if (activeButton === "short break") {
-        setTimeLeft(shortBreak * 60); 
-      } else if (activeButton === "long break") {
-        setTimeLeft(longBreak * 60); 
-      }
-    } else {
-      if (activeButton === "pomodoro") {
-        setTimeLeft(pomodoro * 60);
-      } else if (activeButton === "short break") {
-        setTimeLeft(shortBreak * 60);
-      } else if (activeButton === "long break") {
-        setTimeLeft(longBreak * 60);
-      }
-    } 
   };
 
   const handleDialogClose = () => {
@@ -242,7 +194,7 @@ export default function Timer() {
             variant="contained"
             sx={{
               textTransform: "none",
-              backgroundColor: activeButton === "pomodoro" ? "#21DE84" : "white",
+              backgroundColor: currentMode === "pomodoro" ? "#21DE84" : "white",
               color: "black",
               borderRadius: 8,
             }}
@@ -256,7 +208,7 @@ export default function Timer() {
             variant="contained"
             sx={{
               textTransform: "none",
-              backgroundColor: activeButton === "short break" ? "#21DE84" : "white",
+              backgroundColor: currentMode === "shortBreak" ? "#21DE84" : "white",
               color: "black",
               borderRadius: 8,
             }}
@@ -270,7 +222,7 @@ export default function Timer() {
             variant="contained"
             sx={{
               textTransform: "none",
-              backgroundColor: activeButton === "long break" ? "#21DE84" : "white",
+              backgroundColor: currentMode === "longBreak" ? "#21DE84" : "white",
               color: "black",
               borderRadius: 8,
             }}
@@ -306,7 +258,8 @@ export default function Timer() {
     }
   </Box>
 
-  <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} onSave={handleSave} />
+  {/* Break AI reccommendation pop-up */}
+  <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
 
     <Slide direction="up" in={dropdownOpen} mountOnEnter unmountOnExit>
       <Box
@@ -324,7 +277,7 @@ export default function Timer() {
       >
         <Typography variant="h6" fontWeight="bold">break time! 🎉</Typography>
         <Typography variant="body1">
-          {activeButton === "pomodoro" ? "break is over, back to work!" : "Time for a short break!"}
+          {currentMode === "pomodoro" ? "break is over, back to work!" : "Time for a short break!"}
         </Typography>
         
         {session && userPreference?.spotifyTrackId && (

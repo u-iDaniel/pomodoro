@@ -55,11 +55,13 @@ export const TimerProvider = ({ children }: { children: React.ReactNode }) => {
     setIsActive(false);
   };
 
-  // Save to localStorage when values change
+  // Save to localStorage effect
   useEffect(() => {
-    localStorage.setItem("pomodoroTime", pomodoroTime.toString());
-    localStorage.setItem("shortBreakTime", shortBreakTime.toString());
-    localStorage.setItem("longBreakTime", longBreakTime.toString());
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("pomodoroTime", pomodoroTime.toString());
+      localStorage.setItem("shortBreakTime", shortBreakTime.toString());
+      localStorage.setItem("longBreakTime", longBreakTime.toString());
+    }
   }, [pomodoroTime, shortBreakTime, longBreakTime]);
 
   return (
