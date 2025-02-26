@@ -10,21 +10,49 @@ import UserLogin from './UserLogin';
 import { useState } from 'react';
 import Dialog from './Dialog'; 
 import Link from 'next/link';
-import MuiLink from '@mui/material/Link';
+import { useTimer } from '@/components/TimerContext';
 
 import "@fontsource/montserrat";
 
 interface NavbarProps {
   title: string;
   titleHref?: string;
-  onSettingsSave: (pomodoro: number, shortBreak: number, longBreak: number) => void;
 }
 
-export default function Navbar({ title, titleHref = "/", onSettingsSave }: NavbarProps) {
+export default function Navbar({ title, titleHref = "/" }: NavbarProps) {
   const [openSettings, setOpenSettings] = useState(false);
+  const {
+    setPomodoroTime,
+    setShortBreakTime,
+    setLongBreakTime,
+    currentMode,
+    setTimeLeft,
+    setIsActive
+  } = useTimer();
 
   const handleSettingsOpen = () => setOpenSettings(true);
   const handleSettingsClose = () => setOpenSettings(false);
+
+  const handleSettingsSave = (pomodoro: number, shortBreak: number, longBreak: number) => {
+    const pomodoroSeconds = pomodoro * 60;
+    const shortBreakSeconds = shortBreak * 60;
+    const longBreakSeconds = longBreak * 60;
+    
+    setPomodoroTime(pomodoroSeconds);
+    setShortBreakTime(shortBreakSeconds);
+    setLongBreakTime(longBreakSeconds);
+    
+    if (currentMode === "pomodoro") {
+      setTimeLeft(pomodoroSeconds);
+    } else if (currentMode === "shortBreak") {
+      setTimeLeft(shortBreakSeconds);
+    } else {
+      setTimeLeft(longBreakSeconds);
+    }
+    
+    setIsActive(false);
+    handleSettingsClose();
+  };
 
   return (
     <>
@@ -62,7 +90,7 @@ export default function Navbar({ title, titleHref = "/", onSettingsSave }: Navba
       <Dialog
         open={openSettings}
         onClose={handleSettingsClose}
-        onSave={(pomodoro, shortBreak, longBreak) => onSettingsSave(pomodoro, shortBreak, longBreak)}
+        onSave={handleSettingsSave}
       />
     </>
   );
