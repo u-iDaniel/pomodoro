@@ -363,7 +363,6 @@ export default function Timer() {
       </Box>
 
       {/* Break AI recommendation pop-up */}
-      {/* <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} /> */}
 
       <Slide direction="up" in={dropdownOpen} mountOnEnter unmountOnExit>
         <Box

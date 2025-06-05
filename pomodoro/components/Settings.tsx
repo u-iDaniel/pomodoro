@@ -69,13 +69,14 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
     setLongBreak(String(longBreakNum));
 
     if (currentMode === "pomodoro") {
-      setTimeLeft(pomodoroNum * 60);
+      setTimeLeft(Math.round(pomodoroNum * 60));
     } else if (currentMode === "shortBreak") {
-      setTimeLeft(shortBreakNum * 60);
+      setTimeLeft(Math.round(shortBreakNum * 60));
     } else {
-      setTimeLeft(longBreakNum * 60);
+      setTimeLeft(Math.round(longBreakNum * 60));
     }
 
+    setIsActive(false); // Stop the timer when settings are saved
     onClose();
   };
 

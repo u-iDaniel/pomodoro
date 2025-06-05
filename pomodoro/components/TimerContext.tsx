@@ -21,7 +21,6 @@ const TimerContext = createContext<TimerContextType | undefined>(undefined);
 export const TimerProvider = ({ children }: { children: React.ReactNode }) => {
   const getLocalStorageValue = (key: string, defaultValue: number) => {
     const stored = localStorage.getItem(key);
-    console.log(stored);
     return stored ? Number(stored) : defaultValue;
   };
 
