@@ -7,7 +7,6 @@ import { useState } from "react";
 import Settings from "./Settings";
 import Link from "next/link";
 import "@fontsource/montserrat/200.css";
-import styles from "./Navbar_style.module.css";
 
 interface NavbarProps {
   title: string;
@@ -22,7 +21,7 @@ export default function Navbar({ title, titleHref = "/" }: NavbarProps) {
 
   return (
     <>
-      <div className={styles.navBar}>
+      <div className="flex justify-between ml-5 mr-5 pt-5 items-center">
         <div className="home">
           <Link
             href={titleHref}
@@ -36,7 +35,7 @@ export default function Navbar({ title, titleHref = "/" }: NavbarProps) {
           </Link>
         </div>
 
-        <div className={styles.navElements}>
+        <div className="flex gap-5">
           <Button
             startIcon={<SettingsIcon />}
             sx={{

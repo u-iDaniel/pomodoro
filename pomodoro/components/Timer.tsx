@@ -7,7 +7,6 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid2";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
-import Settings from "./Settings";
 import { useSession } from "next-auth/react";
 import Slide from "@mui/material/Slide";
 import { useTimer } from "@/components/TimerContext";
@@ -40,14 +39,13 @@ export default function Timer() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pomodoroCount, setPomodoroCount] = useState(0);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userPreference, setUserPreference] = useState<UserPreference | null>(
     null
   );
   const [hasBeenAcknowledged, setHasBeenAcknowledged] = useState(true);
 
-  const [pomodoroClicked, setPomodoroClicked] = useState(false);
+  const [pomodoroClicked, setPomodoroClicked] = useState(currentMode === "pomodoro");
   const [shortBreakClicked, setShortBreakClicked] = useState(false);
   const [longBreakClicked, setLongBreakClicked] = useState(false);
 
