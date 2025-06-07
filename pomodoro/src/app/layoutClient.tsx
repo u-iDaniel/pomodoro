@@ -1,17 +1,15 @@
 // This file contains all the client rendered stuff
-'use client';
-import { SessionProvider } from 'next-auth/react'
-import ThemeRegistry from '@/components/ThemeRegistry'
-import CssBaseline from '@mui/material/CssBaseline'
-import Navbar from '@/components/Navbar'
+"use client";
+import { SessionProvider } from "next-auth/react";
+import ThemeRegistry from "@/components/ThemeRegistry";
+import CssBaseline from "@mui/material/CssBaseline";
+import Navbar from "@/components/Navbar";
 import "./globals.css";
-import { useEffect, useState } from 'react';
-import { TimerProvider } from '@/components/TimerContext';
-
-
+import { useEffect, useState } from "react";
+import { TimerProvider } from "@/components/TimerContext";
 
 interface RootLayoutClientProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export default function RootLayoutClient({ children }: RootLayoutClientProps) {
@@ -27,11 +25,11 @@ export default function RootLayoutClient({ children }: RootLayoutClientProps) {
     <ThemeRegistry>
       <SessionProvider refetchOnWindowFocus={false}>
         <CssBaseline />
-          <TimerProvider>
-            <Navbar title="pomoAI" titleHref="/"/>
-            {children}
+        <TimerProvider>
+          <Navbar title="pomoAI" titleHref="/" />
+          {children}
         </TimerProvider>
       </SessionProvider>
     </ThemeRegistry>
-  )
+  );
 }

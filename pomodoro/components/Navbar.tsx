@@ -1,18 +1,12 @@
-"use client"; 
+"use client";
 
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import SettingsIcon from '@mui/icons-material/Settings';
-import Button from '@mui/material/Button';
-import UserLogin from './UserLogin';
-import { useState } from 'react';
-import Dialog from './Dialog'; 
-import Link from 'next/link';
-import { useTimer } from '@/components/TimerContext';
-
-import "@fontsource/montserrat";
+import SettingsIcon from "@mui/icons-material/Settings";
+import Button from "@mui/material/Button";
+import UserLogin from "./UserLogin";
+import { useState } from "react";
+import Settings from "./Settings";
+import Link from "next/link";
+import "@fontsource/montserrat/200.css";
 
 interface NavbarProps {
   title: string;
@@ -20,78 +14,47 @@ interface NavbarProps {
 }
 
 export default function Navbar({ title, titleHref = "/" }: NavbarProps) {
-  const [openSettings, setOpenSettings] = useState(false);
-  const {
-    setPomodoroTime,
-    setShortBreakTime,
-    setLongBreakTime,
-    currentMode,
-    setTimeLeft,
-    setIsActive
-  } = useTimer();
+  const [open, setOpen] = useState(false);
 
-  const handleSettingsOpen = () => setOpenSettings(true);
-  const handleSettingsClose = () => setOpenSettings(false);
-
-  const handleSettingsSave = (pomodoro: number, shortBreak: number, longBreak: number) => {
-    const pomodoroSeconds = pomodoro * 60;
-    const shortBreakSeconds = shortBreak * 60;
-    const longBreakSeconds = longBreak * 60;
-    
-    setPomodoroTime(pomodoroSeconds);
-    setShortBreakTime(shortBreakSeconds);
-    setLongBreakTime(longBreakSeconds);
-    
-    if (currentMode === "pomodoro") {
-      setTimeLeft(pomodoroSeconds);
-    } else if (currentMode === "shortBreak") {
-      setTimeLeft(shortBreakSeconds);
-    } else {
-      setTimeLeft(longBreakSeconds);
-    }
-    
-    setIsActive(false);
-    handleSettingsClose();
-  };
+  const handleSettingsOpen = () => setOpen(true);
+  const handleSettingsClose = () => setOpen(false);
 
   return (
     <>
-      <AppBar position="static" sx={{ backgroundColor: "white", color: "black" }}>
-        <Toolbar sx={{ mt: 2, mb: 2 }}>    
-          {/* Title as a Link */}
-          <Typography
-            variant="h3"
-            component="div"
-            sx={{ fontWeight: 700, fontFamily: 'Montserrat, Arial, sans' }}
+      <div className="flex justify-between ml-5 mr-5 pt-5 items-center">
+        <div className="home">
+          <Link
+            href={titleHref}
+            style={{
+              fontFamily: "Montserrat, Arial, sans",
+              fontSize: "48px",
+              color: "white",
+            }}
           >
-            <Link href={titleHref} style={{ textDecoration: "none", color: "inherit" }}>
-            
-                {title}
-             
-            </Link>
-          </Typography>
+            {title}
+          </Link>
+        </div>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, ml: "auto" }}>
-            {/* Settings Button with Icon */}
-            <Button 
-              color="inherit" 
-              startIcon={<SettingsIcon />} 
-              sx={{ fontFamily: 'Montserrat, Arial, sans', textTransform: 'none', fontSize: '1.5rem' }}
-              onClick={handleSettingsOpen}
-            >
-              settings
-            </Button>
-            <UserLogin />
-          </Box>
-        </Toolbar>
-      </AppBar>
+        <div className="flex gap-5">
+          <Button
+            startIcon={<SettingsIcon />}
+            sx={{
+              fontFamily: "Montserrat, Arial, sans",
+              textTransform: "none",
+              fontSize: "1.5rem",
+              color: "white",
+            }}
+            onClick={handleSettingsOpen}
+          >
+            settings
+          </Button>
+
+          <UserLogin />
+        </div>
+      </div>
 
       {/* Settings Dialog */}
-      <Dialog
-        open={openSettings}
-        onClose={handleSettingsClose}
-        onSave={handleSettingsSave}
-      />
+      <Settings open={open} onClose={handleSettingsClose} />
     </>
   );
 }

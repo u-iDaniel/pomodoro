@@ -7,11 +7,12 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid2";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
-import Dialog from "./Dialog"; 
 import { useSession } from "next-auth/react";
-import Slide from "@mui/material/Slide"
-import { useTimer } from "@/components/TimerContext"; 
-import Link from 'next/link';
+import Slide from "@mui/material/Slide";
+import { useTimer } from "@/components/TimerContext";
+import Link from "next/link";
+import "@fontsource/montserrat/300.css";
+import "@fontsource/montserrat/200.css";
 
 interface UserPreference {
   predictedGenre: string;
@@ -29,7 +30,7 @@ export default function Timer() {
     setMode,
     pomodoroTime,
     shortBreakTime,
-    longBreakTime
+    longBreakTime,
   } = useTimer();
 
   // Use refs to track state safely
@@ -38,10 +39,15 @@ export default function Timer() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pomodoroCount, setPomodoroCount] = useState(0);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [userPreference, setUserPreference] = useState<UserPreference | null>(null);
+  const [userPreference, setUserPreference] = useState<UserPreference | null>(
+    null
+  );
   const [hasBeenAcknowledged, setHasBeenAcknowledged] = useState(true);
+
+  const [pomodoroClicked, setPomodoroClicked] = useState(currentMode === "pomodoro");
+  const [shortBreakClicked, setShortBreakClicked] = useState(false);
+  const [longBreakClicked, setLongBreakClicked] = useState(false);
 
   // Helper functions with useCallback to prevent unnecessary re-renders
   const sendNotification = useCallback((message: string) => {
@@ -51,7 +57,9 @@ export default function Timer() {
   }, []);
 
   const playSound = useCallback(() => {
-    const sound = new Audio("/sounds/mixkit-kids-cartoon-close-bells-2256 (1).mp3");
+    const sound = new Audio(
+      "/sounds/mixkit-kids-cartoon-close-bells-2256 (1).mp3"
+    );
     sound.play().catch((error) => {
       console.error("Audio playback failed:", error);
     });
@@ -60,7 +68,9 @@ export default function Timer() {
   const timeFormat = useCallback((totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    return `${String(minutes).padStart(2, "0")}:${String(
+      Math.floor(seconds)
+    ).padStart(2, "0")}`;
   }, []);
 
   // Request notification permission on mount
@@ -75,7 +85,7 @@ export default function Timer() {
     if (session?.user) {
       const fetchPreferences = async () => {
         try {
-          const response = await fetch('/api/preferences');
+          const response = await fetch("/api/preferences");
           const data = await response.json();
           if (data.preference) {
             setUserPreference({
@@ -84,7 +94,7 @@ export default function Timer() {
             });
           }
         } catch (error) {
-          console.error('Error fetching preferences:', error);
+          console.error("Error fetching preferences:", error);
         }
       };
       fetchPreferences();
@@ -94,9 +104,9 @@ export default function Timer() {
   // Handle timer completion
   const handleTimerComplete = useCallback(() => {
     if (timerCompleteHandled.current) return;
-    
+
     timerCompleteHandled.current = true;
-    
+
     setIsActive(false);
     setDropdownOpen(true);
     setHasBeenAcknowledged(false);
@@ -107,16 +117,22 @@ export default function Timer() {
         if (newCount === 4) {
           sendNotification("you have done 4 pomodoros, take a long break!");
           setTimeout(() => {
-            setTimeLeft(longBreakTime);
+            setTimeLeft(longBreakTime * 60);
             setMode("longBreak");
+            setShortBreakClicked(false);
+            setPomodoroClicked(false);
+            setLongBreakClicked(true);
           }, 0);
           playSound();
           return 0;
         } else {
           sendNotification("pomodoro complete! take a short break.");
           setTimeout(() => {
-            setTimeLeft(shortBreakTime);
+            setTimeLeft(shortBreakTime * 60);
             setMode("shortBreak");
+            setShortBreakClicked(true);
+            setPomodoroClicked(false);
+            setLongBreakClicked(false);
           }, 0);
           playSound();
           return newCount;
@@ -125,16 +141,22 @@ export default function Timer() {
     } else if (currentMode === "shortBreak") {
       sendNotification("short break is over! time to start a pomodoro.");
       setTimeout(() => {
-        setTimeLeft(pomodoroTime);
+        setTimeLeft(pomodoroTime * 60);
         setMode("pomodoro");
+        setShortBreakClicked(false);
+        setPomodoroClicked(true);
+        setLongBreakClicked(false);
       }, 0);
       playSound();
     } else if (currentMode === "longBreak") {
       sendNotification("long break is over! time to start a pomodoro.");
       setTimeout(() => {
-        setTimeLeft(pomodoroTime);
+        setTimeLeft(pomodoroTime * 60);
         setPomodoroCount(0);
         setMode("pomodoro");
+        setShortBreakClicked(false);
+        setPomodoroClicked(true);
+        setLongBreakClicked(false);
       }, 0);
       playSound();
     }
@@ -148,7 +170,7 @@ export default function Timer() {
     setPomodoroCount,
     setIsActive,
     sendNotification,
-    playSound
+    playSound,
   ]);
 
   // Timer countdown effect
@@ -157,7 +179,7 @@ export default function Timer() {
 
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft((prevTimeLeft : number) => prevTimeLeft - 1);
+        setTimeLeft((prevTimeLeft: number) => prevTimeLeft - 1);
       }, 1000);
     }
 
@@ -187,24 +209,33 @@ export default function Timer() {
 
   // Event handler functions
   const pomodoroTimer = useCallback(() => {
+    setPomodoroClicked(true);
+    setShortBreakClicked(false);
+    setLongBreakClicked(false);
     setIsActive(false);
-    setTimeLeft(pomodoroTime);
+    setTimeLeft(pomodoroTime * 60);
     setMode("pomodoro");
   }, [pomodoroTime, setIsActive, setTimeLeft, setMode]);
 
   const toggleTimer = useCallback(() => {
-    setIsActive((prevActive => !prevActive));
+    setIsActive((prevActive) => !prevActive);
   }, [setIsActive]);
 
   const toggleShortBreak = useCallback(() => {
+    setShortBreakClicked(true);
+    setPomodoroClicked(false);
+    setLongBreakClicked(false);
     setIsActive(false);
-    setTimeLeft(shortBreakTime);
+    setTimeLeft(shortBreakTime * 60);
     setMode("shortBreak");
   }, [shortBreakTime, setIsActive, setTimeLeft, setMode]);
 
   const toggleLongBreak = useCallback(() => {
+    setLongBreakClicked(true);
+    setShortBreakClicked(false);
+    setPomodoroClicked(false);
     setIsActive(false);
-    setTimeLeft(longBreakTime);
+    setTimeLeft(longBreakTime * 60);
     setMode("longBreak");
   }, [longBreakTime, setIsActive, setTimeLeft, setMode]);
 
@@ -214,90 +245,130 @@ export default function Timer() {
   }, []);
 
   return (
-    <Box sx={{ position: 'relative' }}>
+    <>
       <Box
         sx={{
           textAlign: "center",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
         }}
       >
         <Grid container spacing={2} justifyContent="center" sx={{ mb: 2 }}>
           <Grid>
-            <Button
-              variant="contained"
-              sx={{
-                textTransform: "none",
-                backgroundColor: currentMode === "pomodoro" ? "#21DE84" : "white",
-                color: "black",
-                borderRadius: 8,
-              }}
+            <button
               onClick={pomodoroTimer}
+              style={{
+                borderRadius: "20px",
+                backgroundColor: "transparent",
+                borderWidth: "1px",
+                borderStyle: "solid",
+                borderColor: pomodoroClicked ? "#00FF37" : "white",
+                padding: "10px 20px",
+                color: pomodoroClicked ? "#00FF37" : "white",
+                transition: "border-color 0.4s ease, color 0.4s ease",
+                fontFamily: "Montserrat, Arial, sans",
+                fontWeight: "200",
+              }}
             >
               pomodoro
-            </Button>
+            </button>
           </Grid>
           <Grid>
-            <Button
-              variant="contained"
-              sx={{
-                textTransform: "none",
-                backgroundColor: currentMode === "shortBreak" ? "#21DE84" : "white",
-                color: "black",
-                borderRadius: 8,
-              }}
+            <button
               onClick={toggleShortBreak}
+              style={{
+                borderRadius: "20px",
+                backgroundColor: "transparent",
+                borderWidth: "1px",
+                borderStyle: "solid",
+                borderColor: shortBreakClicked ? "#00FF37" : "white",
+                padding: "10px 20px",
+                color: shortBreakClicked ? "#00FF37" : "white",
+                transition: "border-color 0.4s ease, color 0.4s ease",
+                fontFamily: "Montserrat, Arial, sans",
+                fontWeight: "200",
+              }}
             >
               short break
-            </Button>
+            </button>
           </Grid>
           <Grid>
-            <Button
-              variant="contained"
-              sx={{
-                textTransform: "none",
-                backgroundColor: currentMode === "longBreak" ? "#21DE84" : "white",
-                color: "black",
-                borderRadius: 8,
-              }}
+            <button
               onClick={toggleLongBreak}
+              style={{
+                borderRadius: "20px",
+                backgroundColor: "transparent",
+                borderWidth: "1px",
+                borderStyle: "solid",
+                borderColor: longBreakClicked ? "#00FF37" : "white",
+                padding: "10px 20px",
+                color: longBreakClicked ? "#00FF37" : "white",
+                transition: "border-color 0.4s ease, color 0.4s ease",
+                fontFamily: "Montserrat, Arial, sans",
+                fontWeight: "200",
+              }}
             >
               long break
-            </Button>
+            </button>
           </Grid>
         </Grid>
 
-        <Typography variant="h1" component="div" sx={{ fontWeight: "bold", mb: 2 }}>
-          {timeFormat(timeLeft)}
-        </Typography>
-
-        <Button
-          startIcon={isActive ? <PauseIcon /> : <PlayArrowIcon />}
-          variant="contained"
-          onClick={toggleTimer}
-          sx={{ textTransform: "none", padding: "0.5rem 4rem", fontSize: 28, backgroundColor: "#DE8421" }}
+        <div
+          style={{
+            fontFamily: "Montserrat, Arial, sans",
+            fontWeight: "300",
+            fontSize: "6rem",
+            color: "white",
+          }}
         >
+          {timeFormat(timeLeft)}
+        </div>
+
+        <button
+          onClick={toggleTimer}
+          style={{
+            width: "250px",
+            fontSize: "28px",
+            fontFamily: "Montserrat, Arial, sans",
+            fontWeight: "300",
+            color: "white",
+            borderWidth: "1px",
+            borderStyle: "solid",
+            borderColor: "white",
+            boxShadow: isActive ? "0 0 10px rgb(236, 247, 236)" : "none",
+            transition: "box-shadow 0.4s ease",
+            padding: "10px 40px",
+            borderRadius: "50px",
+          }}
+        >
+          {isActive ? <PauseIcon /> : <PlayArrowIcon />}
           {isActive ? "pause" : "start"}
-        </Button>
-        
-        {session ? "" : (
-          <Typography variant="body1" component="div" sx={{ mt: 8, mb: 2 }}>
-            want AI personalized break recommendations? <Link className="underline" href={"/login"}>sign up</Link>
-          </Typography>
+        </button>
+
+        {session ? (
+          ""
+        ) : (
+          <div
+            style={{
+              fontFamily: "Montserrat, Arial, sans",
+              fontWeight: "200",
+              color: "white",
+              marginTop: "50px",
+            }}
+          >
+            want AI personalized break recommendations?{" "}
+            <Link className="underline" href={"/login"}>
+              sign up
+            </Link>
+          </div>
         )}
       </Box>
 
       {/* Break AI recommendation pop-up */}
-      <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
 
       <Slide direction="up" in={dropdownOpen} mountOnEnter unmountOnExit>
         <Box
           sx={{
             position: "fixed",
-            top: "70%", 
+            top: "70%",
             right: "5%",
             width: 350,
             bgcolor: "#8421DE",
@@ -307,15 +378,20 @@ export default function Timer() {
             color: "white",
           }}
         >
-          <Typography variant="h6" fontWeight="bold">break time! 🎉</Typography>
-          <Typography variant="body1">
-            {currentMode === "pomodoro" ? "break is over, back to work!" : "Time for a short break!"}
+          <Typography variant="h6" fontWeight="bold">
+            break time! 🎉
           </Typography>
-          
+          <Typography variant="body1">
+            {currentMode === "pomodoro"
+              ? "break is over, back to work!"
+              : "Time for a short break!"}
+          </Typography>
+
           {session && userPreference?.spotifyTrackId && (
             <Box sx={{ mt: 2, mb: 2 }}>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                Recommended {userPreference.predictedGenre} track for your break:
+                Recommended {userPreference.predictedGenre} track for your
+                break:
               </Typography>
               <iframe
                 src={`https://open.spotify.com/embed/track/${userPreference.spotifyTrackId}`}
@@ -328,16 +404,15 @@ export default function Timer() {
             </Box>
           )}
 
-          <Button 
-            onClick={handleDialogClose} 
-            variant="contained" 
+          <Button
+            onClick={handleDialogClose}
+            variant="contained"
             sx={{ mt: 1, backgroundColor: "#673AB7" }}
           >
             OK
           </Button>
         </Box>
       </Slide>
-    </Box>
+    </>
   );
 }
-
