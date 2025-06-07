@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState, useEffect } from "react";
+import { FC, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -34,46 +34,44 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
     setIsActive,
   } = useTimer();
 
-  // Use seconds for the timers
   const [pomodoro, setPomodoro] = useState(() => {
     const stored = localStorage.getItem("pomodoroTime");
-    return stored ? String(Number(stored)) : "25"; // Default 25 minutes
+    return stored ? Number(stored) : 25; // Default 25 minutes
   });
 
   const [shortBreak, setShortBreak] = useState(() => {
     const stored = localStorage.getItem("shortBreakTime");
-    return stored ? String(Number(stored)) : "5"; // Default 5 minutes
+    return stored ? Number(stored) : 5; // Default 5 minutes
   });
 
   const [longBreak, setLongBreak] = useState(() => {
     const stored = localStorage.getItem("longBreakTime");
-    return stored ? String(Number(stored)) : "15"; // Default 15 minutes
+    return stored ? Number(stored) : 15; // Default 15 minutes
   });
 
   const handleSave = () => {
-    let pomodoroNum = Number(pomodoro);
-    let shortBreakNum = Number(shortBreak);
-    let longBreakNum = Number(longBreak);
-
     // Store values in minutes in localStorage
-    localStorage.setItem("pomodoroTime", String(pomodoroNum));
-    localStorage.setItem("shortBreakTime", String(shortBreakNum));
-    localStorage.setItem("longBreakTime", String(longBreakNum));
+    localStorage.setItem("pomodoroTime", String(pomodoro));
+    localStorage.setItem("shortBreakTime", String(shortBreak));
+    localStorage.setItem("longBreakTime", String(longBreak));
 
-    setPomodoroTime(pomodoroNum);
-    setShortBreakTime(shortBreakNum);
-    setLongBreakTime(longBreakNum);
+    // For actual timer
+    setPomodoroTime(pomodoro);
+    setShortBreakTime(shortBreak);
+    setLongBreakTime(longBreak);
 
-    setPomodoro(String(pomodoroNum));
-    setShortBreak(String(shortBreakNum));
-    setLongBreak(String(longBreakNum));
+    // For settings
+    setPomodoro(pomodoro);
+    setShortBreak(shortBreak);
+    setLongBreak(longBreak);
 
+    // Convert to seconds for the timer
     if (currentMode === "pomodoro") {
-      setTimeLeft(Math.round(pomodoroNum * 60));
+      setTimeLeft(Math.round(pomodoro * 60));
     } else if (currentMode === "shortBreak") {
-      setTimeLeft(Math.round(shortBreakNum * 60));
+      setTimeLeft(Math.round(shortBreak * 60));
     } else {
-      setTimeLeft(Math.round(longBreakNum * 60));
+      setTimeLeft(Math.round(longBreak * 60));
     }
 
     setIsActive(false); // Stop the timer when settings are saved
@@ -130,11 +128,11 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
               }}
               onChange={(e) => {
                 if (e.target.value === "") {
-                  setPomodoro("");
+                  setPomodoro(0);
                 } else {
-                  let value = Number(e.target.value);
+                  const value = Number(e.target.value);
                   if (!isNaN(value) && value >= 0) {
-                    setPomodoro(String(value));
+                    setPomodoro(value);
                   }
                 }
               }}
@@ -169,11 +167,11 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
               }}
               onChange={(e) => {
                 if (e.target.value === "") {
-                  setShortBreak("");
+                  setShortBreak(0);
                 } else {
-                  let value = Number(e.target.value);
+                  const value = Number(e.target.value);
                   if (!isNaN(value) && value >= 0) {
-                    setShortBreak(String(value));
+                    setShortBreak(value);
                   }
                 }
               }}
@@ -207,11 +205,11 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
               }}
               onChange={(e) => {
                 if (e.target.value === "") {
-                  setLongBreak("");
+                  setLongBreak(0);
                 } else {
-                  let value = Number(e.target.value);
+                  const value = Number(e.target.value);
                   if (!isNaN(value) && value >= 0) {
-                    setLongBreak(String(value));
+                    setLongBreak(value);
                   }
                 }
               }}
