@@ -60,11 +60,6 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
     setShortBreakTime(shortBreak);
     setLongBreakTime(longBreak);
 
-    // For settings
-    setPomodoro(pomodoro);
-    setShortBreak(shortBreak);
-    setLongBreak(longBreak);
-
     // Convert to seconds for the timer
     if (currentMode === "pomodoro") {
       setTimeLeft(Math.round(pomodoro * 60));
