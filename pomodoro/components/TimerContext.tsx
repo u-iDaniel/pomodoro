@@ -49,11 +49,11 @@ export const TimerProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Reset countdown immediately
     if (mode === "pomodoro") {
-      setTimeLeft(Number(pomodoroTime) * 60);
+      setTimeLeft(Math.round(Number(pomodoroTime) * 60));
     } else if (mode === "shortBreak") {
-      setTimeLeft(Number(shortBreakTime) * 60);
+      setTimeLeft(Math.round(Number(shortBreakTime) * 60));
     } else {
-      setTimeLeft(Number(longBreakTime) * 60);
+      setTimeLeft(Math.round(Number(longBreakTime) * 60));
     }
 
     // Stop the timer when mode changes

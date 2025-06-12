@@ -7,6 +7,7 @@ import { useState } from "react";
 import Settings from "./Settings";
 import Link from "next/link";
 import "@fontsource/montserrat/200.css";
+import TaskButton from "./TaskButton";
 
 interface NavbarProps {
   title: string;
@@ -36,6 +37,7 @@ export default function Navbar({ title, titleHref = "/" }: NavbarProps) {
         </div>
 
         <div className="flex gap-5">
+          <TaskButton />
           <Button
             startIcon={<SettingsIcon />}
             sx={{
