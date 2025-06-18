@@ -2,15 +2,15 @@
 import { createContext, useContext, useState } from "react";
 
 interface TimerContextType {
-  pomodoroTime: number;
-  shortBreakTime: number;
-  longBreakTime: number;
+  pomodoroTime: string;
+  shortBreakTime: string;
+  longBreakTime: string;
   timeLeft: number;
   isActive: boolean;
   currentMode: "pomodoro" | "shortBreak" | "longBreak";
-  setPomodoroTime: (value: number | ((prev: number) => number)) => void;
-  setShortBreakTime: (value: number | ((prev: number) => number)) => void;
-  setLongBreakTime: (value: number | ((prev: number) => number)) => void;
+  setPomodoroTime: (value: string | ((prev: string) => string)) => void;
+  setShortBreakTime: (value: string | ((prev: string) => string)) => void;
+  setLongBreakTime: (value: string | ((prev: string) => string)) => void;
   setMode: (mode: "pomodoro" | "shortBreak" | "longBreak") => void;
   setIsActive: (value: boolean | ((prev: boolean) => boolean)) => void;
   setTimeLeft: (value: number | ((prev: number) => number)) => void;
@@ -19,28 +19,28 @@ interface TimerContextType {
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 export const TimerProvider = ({ children }: { children: React.ReactNode }) => {
-  const getLocalStorageValue = (key: string, defaultValue: number) => {
+  const getLocalStorageValue = (key: string, defaultValue: string) => {
     const stored = localStorage.getItem(key);
-    return stored ? Number(stored) : defaultValue;
+    return stored ? stored : defaultValue;
   };
 
   const [pomodoroTime, setPomodoroTime] = useState(() =>
-    getLocalStorageValue("pomodoroTime", 25)
+    getLocalStorageValue("pomodoroTime", "25")
   );
 
   const [shortBreakTime, setShortBreakTime] = useState(() =>
-    getLocalStorageValue("shortBreakTime", 5)
+    getLocalStorageValue("shortBreakTime", "5")
   );
 
   const [longBreakTime, setLongBreakTime] = useState(() =>
-    getLocalStorageValue("longBreakTime", 15)
+    getLocalStorageValue("longBreakTime", "15")
   );
 
   const [currentMode, setCurrentMode] = useState<
     "pomodoro" | "shortBreak" | "longBreak"
   >("pomodoro");
 
-  const [timeLeft, setTimeLeft] = useState(pomodoroTime * 60);
+  const [timeLeft, setTimeLeft] = useState(Number(pomodoroTime) * 60);
   const [isActive, setIsActive] = useState(false);
 
   // Function to update mode and reset countdown
@@ -49,11 +49,11 @@ export const TimerProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Reset countdown immediately
     if (mode === "pomodoro") {
-      setTimeLeft(pomodoroTime * 60);
+      setTimeLeft(Math.round(Number(pomodoroTime) * 60));
     } else if (mode === "shortBreak") {
-      setTimeLeft(shortBreakTime * 60);
+      setTimeLeft(Math.round(Number(shortBreakTime) * 60));
     } else {
-      setTimeLeft(longBreakTime * 60);
+      setTimeLeft(Math.round(Number(longBreakTime) * 60));
     }
 
     // Stop the timer when mode changes
