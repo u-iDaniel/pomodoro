@@ -71,7 +71,7 @@ export default function TaskList() {
   }, [tasks]);
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center text-black">
       <div className="bg-gray-100 rounded-lg w-1/3 text-center">
         <div className="text-2xl p-2">add items</div>
         <Divider />
