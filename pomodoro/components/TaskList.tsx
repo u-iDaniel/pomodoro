@@ -5,6 +5,7 @@ import Divider from "@mui/material/Divider";
 import ClearIcon from "@mui/icons-material/Clear";
 import Edit from "../components/Edit";
 import CheckIcon from "@mui/icons-material/Check";
+import Generate from "../components/Generate";
 
 interface Task {
   id: number;
@@ -23,6 +24,15 @@ export default function TaskList() {
   const [editTaskID, setEditTaskID] = useState(0);
 
   const [open, setOpen] = useState(false);
+  const [openAI, setOpenAI] = useState(false);
+
+  const handleAIOpen = () => {
+    setOpenAI(true);
+  };
+
+  const handleAIClose = () => {
+    setOpenAI(false);
+  };
 
   const handleEditOpen = (taskID: number) => {
     setEditTaskID(taskID);
@@ -73,7 +83,7 @@ export default function TaskList() {
   return (
     <div className="flex justify-center text-black">
       <div className="bg-gray-100 rounded-lg w-1/3 text-center">
-        <div className="text-2xl p-2">add items</div>
+        <div className="text-2xl p-2">add tasks</div>
         <Divider />
         <div className="p-2">
           <div className="flex justify-center items-center gap-5">
@@ -145,14 +155,21 @@ export default function TaskList() {
             />
             <button
               onClick={addTask}
-              className="p-2 border border-black rounded-2xl"
+              className="p-2 border-2 border-black rounded-2xl transition duration-200 hover:shadow-lg hover:scale-105"
             >
               add
             </button>
           </div>
+          <div className="p-2">or</div>
+          <button
+            onClick={handleAIOpen}
+            className="relative bg-gradient-to-r from-[#00d4ff] to-[#90f7ec] text-black border-2 border-black rounded-2xl px-5 py-2 font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-[0_4px_15px_rgba(0,212,255,0.5)] overflow-hidden"
+          >
+            generate with ai
+          </button>
           <div className="text-2xl p-2">your tasks:</div>
           <Divider />
-          <ul>
+          <ul className="max-h-[50vh] overflow-y-auto">
             {tasks.map((task) => (
               <li key={task.id} className="break-words whitespace-normal">
                 <span className="block">{task.text}</span>
@@ -160,10 +177,10 @@ export default function TaskList() {
                 <div className="flex gap-10 justify-center mb-2 mt-2">
                   <button
                     onClick={() => setCompleted(task.id)}
+                    className="border-2"
                     style={{
                       borderRadius: "1rem",
                       backgroundColor: "transparent",
-                      borderWidth: "1px",
                       borderStyle: "solid",
                       paddingLeft: "0.5rem",
                       paddingRight: "0.5rem",
@@ -178,13 +195,13 @@ export default function TaskList() {
                   </button>
                   <button
                     onClick={() => handleEditOpen(task.id)}
-                    className="border border-black rounded-2xl pl-2 pr-2"
+                    className="border-2 border-black rounded-2xl pl-2 pr-2 transition duration-200 hover:shadow-lg hover:scale-105"
                   >
                     edit
                   </button>
                   <button
                     onClick={() => clearTask(task.id)}
-                    className="border border-black rounded-2xl pl-2 pr-2"
+                    className="border-2 border-black rounded-2xl pl-2 pr-2 transition duration-200 hover:shadow-lg hover:scale-105"
                   >
                     <ClearIcon />
                   </button>
@@ -196,7 +213,7 @@ export default function TaskList() {
           <div className="flex justify-end">
             <button
               onClick={clearAllTasks}
-              className="p-2 border border-black rounded-2xl mt-2"
+              className="p-2 border-2 border-black rounded-2xl mt-2 transition duration-200 hover:shadow-lg hover:scale-105"
             >
               clear list
             </button>
@@ -207,6 +224,7 @@ export default function TaskList() {
             taskID={editTaskID}
             setTasks={setTasks}
           />
+          <Generate open={openAI} onClose={handleAIClose} setTasks={setTasks} />
         </div>
       </div>
     </div>

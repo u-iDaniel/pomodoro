@@ -151,7 +151,7 @@ const Edit: FC<DialogComponentProps> = ({
         <DialogActions>
           <button
             onClick={saveEdit}
-            className="p-2 border border-black rounded-2xl"
+            className="p-2 border-2 border-black rounded-2xl transition duration-200 hover:shadow-lg hover:scale-105"
           >
             save
           </button>

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/u-iDaniel/pomodoro/tree/artheinian_ramos#readme",
   "dependencies": {
+    "@google/genai": "^1.6.0",
     "react": "^19.0.0"
   },
   "devDependencies": {
