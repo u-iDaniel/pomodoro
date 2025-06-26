@@ -5,7 +5,7 @@ const buttonIconSVGEl = document.getElementById('button-icon');
 const buttonTextEl = document.getElementById('button-text');
 const inactiveDiv = document.getElementById('inactive');
 
-let isActive = false;
+// let isActive = false;
 
 // Converts camelCase to spaced lowercase (e.g. "shortBreak" -> "short break")
 function convertCamelCaseToSpaced(text) {
@@ -18,6 +18,11 @@ function convertCamelCaseToSpaced(text) {
     return textArr.join("");
 }
 
+function updateButtonState(active) {
+    buttonIconSVGEl.setAttribute('src', active ? './pause.svg' : './start.svg');
+    buttonTextEl.textContent = active ? 'pause' : 'start';
+    active ? buttonEl.classList.add('button-box-shadow') : buttonEl.classList.remove('button-box-shadow');
+}
 
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'sync' && changes.currentTimer && changes.currentTimer?.newValue) {
@@ -26,19 +31,24 @@ chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'sync' && changes.currentMode && changes.currentMode?.newValue) {
         modeEl.textContent = convertCamelCaseToSpaced(changes.currentMode.newValue);
     }
+    if (area === 'sync' && changes.isActive && changes.isActive?.newValue !== undefined) {
+        console.log(`Popup: Web Timer button clicked, current state is ${changes.isActive.newValue ? 'active' : 'inactive'}`);
+        updateButtonState(changes.isActive.newValue);
+    }
 });
 
 buttonEl.addEventListener('click', () => {
-    isActive = !isActive;
-    const action = isActive ? "START" : "PAUSE";
-    // port.postMessage({ type: "TIMER", action });
-    buttonIconSVGEl.setAttribute('src', isActive ? './pause.svg' : './start.svg');
-    buttonTextEl.textContent = isActive ? 'pause' : 'start';
-    isActive ? buttonEl.classList.add('button-box-shadow') : buttonEl.classList.remove('button-box-shadow');
+    chrome.tabs.query({ url: ["*://localhost/*", "https://pomoai.tech/*"] }, (tabs) => {
+        if (tabs.length > 0) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+                type: "TOGGLE_TIMER"
+            });
+        }
+    });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    chrome.storage.sync.get(['isPomoAITabPresent', 'currentTimer', 'currentMode'], (result) => {
+    chrome.storage.sync.get(['isPomoAITabPresent', 'currentTimer', 'currentMode', 'isActive'], (result) => {
         if (result.currentTimer) {
             timerEl.textContent = result.currentTimer;
         }
@@ -47,12 +57,19 @@ document.addEventListener('DOMContentLoaded', () => {
             modeEl.textContent = convertCamelCaseToSpaced(result.currentMode);
         }
 
+        if (result.isActive !== undefined) {
+            updateButtonState(result.isActive);
+        }
+
         if (result.isPomoAITabPresent) {
             inactiveDiv.style.display = 'none';
         } else {
             inactiveDiv.style.display = 'block';
             timerEl.textContent = 'xx:xx';
             modeEl.textContent = '';
+            buttonEl.disabled = true;
+            updateButtonState(false);
+            buttonEl.classList.add('button-disabled');
         }
     });
 });

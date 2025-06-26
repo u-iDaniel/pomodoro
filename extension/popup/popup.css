@@ -56,7 +56,6 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  cursor: pointer;
   width: 150px;
   height: 50px;
   transition: box-shadow 0.3s ease-in-out;
@@ -66,12 +65,21 @@ body {
   box-shadow: rgb(236, 247, 236) 0px 0px 10px;
 }
 
+.button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 #inactive {
   color: white;
 }
 
 a {
   color: inherit;
+}
+
+button {
+  cursor: pointer;
 }
 
 p#mode {

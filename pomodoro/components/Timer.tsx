@@ -102,6 +102,56 @@ export default function Timer() {
     }
   }, [session]);
 
+  // Timer countdown effect (uses web worker to prevent timer slowing down when tab is in background)
+  useEffect(() => {
+    // Initialize worker on first mount
+    if (!workerRef.current) {
+      const workerUrl = new URL('../public/timerWorker.js', import.meta.url); // has to be js to be loaded in the browser (typescript will not work)
+      workerRef.current = new Worker(workerUrl);
+      // Receives messages from the worker and sets timeLeft
+      workerRef.current.onmessage = (e) => {
+        const { timeLeft: newTimeLeft } = e.data;
+        setTimeLeft(newTimeLeft as number);
+      };
+    }
+
+    if (isActive && timeLeft > 0) {
+      // Post message to worker to start countdown
+      workerRef.current.postMessage({ 
+        action: "START",
+        timeLeft,
+      });
+    } else if (!isActive && timeLeft > 0) {
+      // Post message to worker to pause countdown
+      workerRef.current.postMessage({
+        action: "PAUSE",
+        timeLeft,
+      });
+    }
+  }, [isActive, setTimeLeft, timeLeft]);
+
+  // Send over timer state to chrome extension
+  useEffect(() => {
+    console.log("Post message sent to extension, currentMode:", currentMode, "isActive:", isActive, "timeLeft:", timeLeft);
+    window.postMessage({
+      type: "TIMER",
+      action: "UPDATE",
+      mode: currentMode,
+      timeLeft: timeFormat(timeLeft),
+      isActive: isActive,
+    });
+}, [currentMode, isActive, timeFormat, timeLeft]);
+  
+  // Cleanup worker on unmount
+  useEffect(() => {
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+        workerRef.current = null;
+      }
+    };
+  }, []);
+  
   // Handle timer completion
   const handleTimerComplete = useCallback(() => {
     if (timerCompleteHandled.current) return;
@@ -174,54 +224,6 @@ export default function Timer() {
     playSound,
   ]);
 
-  // Timer countdown effect (uses web worker to prevent timer slowing down when tab is in background)
-  useEffect(() => {
-    // Initialize worker on first mount
-    if (!workerRef.current) {
-      const workerUrl = new URL('../public/timerWorker.js', import.meta.url); // has to be js to be loaded in the browser (typescript will not work)
-      workerRef.current = new Worker(workerUrl);
-      // Receives messages from the worker and sets timeLeft
-      workerRef.current.onmessage = (e) => {
-        const { timeLeft: newTimeLeft } = e.data;
-        setTimeLeft(newTimeLeft as number);
-      };
-    }
-
-    if (isActive && timeLeft > 0) {
-      // Post message to worker to start countdown
-      workerRef.current.postMessage({ 
-        action: "START",
-        timeLeft,
-      });
-    } else if (!isActive && timeLeft > 0) {
-      // Post message to worker to pause countdown
-      workerRef.current.postMessage({
-        action: "PAUSE",
-        timeLeft,
-      });
-    }
-  }, [isActive, setTimeLeft, timeLeft]);
-
-  // Send over timer state to chrome extension
-  useEffect(() => {
-  window.postMessage({
-    type: "TIMER",
-    action: "UPDATE",
-    mode: currentMode,
-    timeLeft: timeFormat(timeLeft),
-  });
-}, [currentMode, timeFormat, timeLeft]);
-  
-  // Cleanup worker on unmount
-  useEffect(() => {
-    return () => {
-      if (workerRef.current) {
-        workerRef.current.terminate();
-        workerRef.current = null;
-      }
-    };
-  }, []);
-
   // Timer complete check effect - separate from main countdown
   useEffect(() => {
     // Skip first render
@@ -252,13 +254,7 @@ export default function Timer() {
     setIsActive(false);
     setTimeLeft(pomodoroTime * 60);
     setMode("pomodoro");
-    window.postMessage({
-      type: "TIMER",
-      action: "UPDATE",
-      mode: "pomodoro",
-      timeLeft: timeFormat(pomodoroTime * 60),
-    });
-  }, [pomodoroTime, setIsActive, setTimeLeft, setMode, timeFormat]);
+  }, [pomodoroTime, setIsActive, setTimeLeft, setMode]);
 
   const toggleTimer = useCallback(() => {
     setIsActive((prevActive) => !prevActive);
@@ -367,6 +363,7 @@ export default function Timer() {
         </div>
 
         <button
+          id="pomoai-timer-button"
           onClick={toggleTimer}
           style={{
             width: "250px",
