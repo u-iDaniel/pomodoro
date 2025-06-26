@@ -1,4 +1,5 @@
 {
+    "$schema": "https://json.schemastore.org/chrome-manifest",
     "name": "pomoAI Companion",
     "version": "1.0.0",
     "description": "A companion browser extension for pomoAI, enhancing productivity with website blocking and more!",
@@ -12,10 +13,29 @@
     "permissions": [
         "tabs",
         "scripting",
-        "storage"
+        "storage",
+        "declarativeNetRequest"
+    ],
+    "host_permissions": [
+        "https://pomoai.tech/*",
+        "*://localhost/*"
     ],
     "background": {
-        "service_worker": "background.js"
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://pomoai.tech/*", "*://localhost/*"],
+            "js": ["content-script.js"],
+            "run_at": "document_end"
+        }
+    ],
+    "externally_connectable": {
+        "matches": [
+            "https://pomoai.tech/*",
+            "*://localhost/*"
+        ]
     },
     "action": {
         "default_popup": "popup/popup.html",
