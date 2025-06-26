@@ -57,6 +57,13 @@ body {
   justify-content: center;
   gap: 8px;
   cursor: pointer;
+  width: 150px;
+  height: 50px;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.button-box-shadow {
+  box-shadow: rgb(236, 247, 236) 0px 0px 10px;
 }
 
 #inactive {
@@ -65,4 +72,8 @@ body {
 
 a {
   color: inherit;
+}
+
+p#mode {
+  font-size: 1.2rem;
 }
