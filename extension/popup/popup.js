@@ -1,9 +1,11 @@
+const pomoAIWebsitePatterns = ["*://localhost/*", "https://pomoai.tech/*"];
 const timerEl  = document.getElementById('timer');
 const buttonEl = document.getElementById('timer-button');
 const modeEl = document.getElementById('mode');
 const buttonIconSVGEl = document.getElementById('button-icon');
 const buttonTextEl = document.getElementById('button-text');
 const inactiveDiv = document.getElementById('inactive');
+const inactiveTextEl = document.getElementById('inactive-text');
 
 // let isActive = false;
 
@@ -25,20 +27,20 @@ function updateButtonState(active) {
 }
 
 chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'sync' && changes.currentTimer && changes.currentTimer?.newValue) {
+    if (area === 'local' && changes.currentTimer && changes.currentTimer?.newValue) {
         timerEl.textContent = changes.currentTimer.newValue;
     }
-    if (area === 'sync' && changes.currentMode && changes.currentMode?.newValue) {
+    if (area === 'local' && changes.currentMode && changes.currentMode?.newValue) {
         modeEl.textContent = convertCamelCaseToSpaced(changes.currentMode.newValue);
     }
-    if (area === 'sync' && changes.isActive && changes.isActive?.newValue !== undefined) {
+    if (area === 'local' && changes.isActive && changes.isActive?.newValue !== undefined) {
         console.log(`Popup: Web Timer button clicked, current state is ${changes.isActive.newValue ? 'active' : 'inactive'}`);
         updateButtonState(changes.isActive.newValue);
     }
 });
 
 buttonEl.addEventListener('click', () => {
-    chrome.tabs.query({ url: ["*://localhost/*", "https://pomoai.tech/*"] }, (tabs) => {
+    chrome.tabs.query({ url: pomoAIWebsitePatterns }, (tabs) => {
         if (tabs.length > 0) {
             chrome.tabs.sendMessage(tabs[0].id, {
                 type: "TOGGLE_TIMER"
@@ -48,7 +50,7 @@ buttonEl.addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    chrome.storage.sync.get(['isPomoAITabPresent', 'currentTimer', 'currentMode', 'isActive'], (result) => {
+    chrome.storage.local.get(['isPomoAITabPresent', 'isTooManyPomoAITabs', 'currentTimer', 'currentMode', 'isActive'], (result) => {
         if (result.currentTimer) {
             timerEl.textContent = result.currentTimer;
         }
@@ -70,6 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
             buttonEl.disabled = true;
             updateButtonState(false);
             buttonEl.classList.add('button-disabled');
+            if (result.isTooManyPomoAITabs) {
+                inactiveTextEl.textContent = 'the extension works best with only one tab open, please close the others';
+            }
         }
     });
 });

@@ -119,13 +119,13 @@ export default function Timer() {
       // Post message to worker to start countdown
       workerRef.current.postMessage({ 
         action: "START",
-        timeLeft,
+        timeLeft: Math.round(timeLeft),
       });
     } else if (!isActive && timeLeft > 0) {
       // Post message to worker to pause countdown
       workerRef.current.postMessage({
         action: "PAUSE",
-        timeLeft,
+        timeLeft: Math.round(timeLeft),
       });
     }
   }, [isActive, setTimeLeft, timeLeft]);

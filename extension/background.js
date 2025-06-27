@@ -1,10 +1,14 @@
-const pomoAIWebsitePattern = "*://localhost/*";
+const pomoAIWebsitePatterns = ["*://localhost/*", "*://pomoai.tech/*"];
 
 async function checkPomoAITab() {
-  const tabs = await chrome.tabs.query({ url: pomoAIWebsitePattern });
-  const isPresent = tabs.length > 0;
+  const tabs = await chrome.tabs.query({ url: pomoAIWebsitePatterns });
+  const isPresent = tabs.length === 1;
+  const isTooManyTabs = tabs.length > 1;
 
-  await chrome.storage.sync.set({ isPomoAITabPresent: isPresent });
+  await chrome.storage.local.set({ 
+    isPomoAITabPresent: isPresent,
+    isTooManyPomoAITabs: isTooManyTabs,
+  });
 
   if (isPresent) {
     await chrome.action.setIcon({ path: "icons/icon128.png" });

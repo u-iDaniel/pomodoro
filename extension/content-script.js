@@ -6,7 +6,7 @@ window.addEventListener("message", (event) => {
 
     if (event.data.type === "TIMER") {
         console.log(`Content Script: Received timer update, isActive: ${event.data.isActive}`);
-        chrome.storage.sync.set({ 
+        chrome.storage.local.set({ 
             currentTimer: event.data.timeLeft,
             currentMode: event.data.mode,
             isActive: event.data.isActive,
