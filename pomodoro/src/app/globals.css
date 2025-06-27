@@ -35,6 +35,6 @@ html, body {
 
 body {
   color: var(--foreground);
-  background-image: var(--background);
+  background: var(--background) fixed no-repeat;
   font-family: "Montserrat", Arial, sans-serif;
 }

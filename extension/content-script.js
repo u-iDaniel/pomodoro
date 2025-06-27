@@ -5,11 +5,16 @@ window.addEventListener("message", (event) => {
     }
 
     if (event.data.type === "TIMER") {
-        console.log(`Content Script: Received timer update, isActive: ${event.data.isActive}`);
         chrome.storage.local.set({ 
             currentTimer: event.data.timeLeft,
             currentMode: event.data.mode,
             isActive: event.data.isActive,
+        });
+    }
+
+    if (event.data.type === "BLOCKED_SITES_UPDATE") {
+        chrome.storage.local.set({ 
+            blockedSites: event.data.blockedSites,
         });
     }
 });

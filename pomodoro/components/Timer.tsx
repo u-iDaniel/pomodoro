@@ -132,7 +132,6 @@ export default function Timer() {
 
   // Send over timer state to chrome extension
   useEffect(() => {
-    console.log("Post message sent to extension, currentMode:", currentMode, "isActive:", isActive, "timeLeft:", timeLeft);
     window.postMessage({
       type: "TIMER",
       action: "UPDATE",

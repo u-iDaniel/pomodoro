@@ -34,7 +34,6 @@ chrome.storage.onChanged.addListener((changes, area) => {
         modeEl.textContent = convertCamelCaseToSpaced(changes.currentMode.newValue);
     }
     if (area === 'local' && changes.isActive && changes.isActive?.newValue !== undefined) {
-        console.log(`Popup: Web Timer button clicked, current state is ${changes.isActive.newValue ? 'active' : 'inactive'}`);
         updateButtonState(changes.isActive.newValue);
     }
 });
