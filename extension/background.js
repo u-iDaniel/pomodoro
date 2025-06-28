@@ -16,12 +16,12 @@ function isUrlBlocked(url, blockedSites) {
   }
 }
 
-// Check if timer is active and if so then also check if active tab is blocked
+// Check if pomodoro mode is active and if so then also check if active tab is blocked
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && changes.isActive && changes.isActive.newValue === true) {
+  if (area === 'local' && changes?.currentMode?.newValue === 'pomodoro') {
     chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-      const { currentMode, blockedSites } = await chrome.storage.local.get(['currentMode', 'blockedSites']);
-      if (currentMode === 'pomodoro' && blockedSites && blockedSites.length > 0) {
+      const { blockedSites } = await chrome.storage.local.get('blockedSites');
+      if (tabs.length > 0 && blockedSites && blockedSites.length > 0) {
         const tab = tabs[0];
         if (isUrlBlocked(tab.url, blockedSites)) {
           chrome.tabs.update(tab.id, { url: chrome.runtime.getURL("blocked.html") });
@@ -33,9 +33,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 // Fires when the active tab changes (mainly to prevent users from bypassing the block list by switching previously opened tabs)
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
-  const { isActive, currentMode, blockedSites } = await chrome.storage.local.get(['isActive', 'currentMode', 'blockedSites']);
+  const { currentMode, blockedSites } = await chrome.storage.local.get(['isActive', 'currentMode', 'blockedSites']);
   const tab = await chrome.tabs.get(activeInfo.tabId);
-  if (isActive && currentMode === 'pomodoro' && blockedSites && blockedSites.length > 0) {
+  if (currentMode === 'pomodoro' && blockedSites && blockedSites.length > 0) {
     if (isUrlBlocked(tab.url, blockedSites)) {
       chrome.tabs.update(tab.id, { url: chrome.runtime.getURL("blocked.html") });
     }
@@ -48,8 +48,8 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     return;
   }
 
-  const { isActive, currentMode, blockedSites } = await chrome.storage.local.get(['isActive', 'currentMode', 'blockedSites']);
-  if (isActive && currentMode === 'pomodoro' && blockedSites && blockedSites.length > 0) {
+  const { currentMode, blockedSites } = await chrome.storage.local.get(['isActive', 'currentMode', 'blockedSites']);
+  if (currentMode === 'pomodoro' && blockedSites && blockedSites.length > 0) {
     if (isUrlBlocked(tab.url, blockedSites)) {
       chrome.tabs.update(tabId, { url: chrome.runtime.getURL("blocked.html") });
     }
