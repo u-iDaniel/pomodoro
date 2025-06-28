@@ -23,4 +23,15 @@ model users {
   imageicon   String?      @db.VarChar(255)
   name        String       @db.VarChar(255)
   preference  preference[]
+  task        task[]
+}
+
+model task {
+  taskid       String  @id @db.VarChar(255)
+  userid       String  @db.Uuid
+  text         String
+  completed    Boolean
+  numPomodoros Int
+
+  users users @relation(fields: [userid], references: [userid], onDelete: Cascade, onUpdate: NoAction)
 }

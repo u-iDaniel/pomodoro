@@ -22,7 +22,7 @@ export default function TaskButton() {
         }}
         onClick={handleTasks}
       >
-        tasks
+        edit tasks
       </Button>
     </>
   );
