@@ -10,6 +10,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import "@fontsource/montserrat/200.css";
+import { useSession } from "next-auth/react";
 
 import TextField from "@mui/material/TextField";
 
@@ -33,6 +34,7 @@ const Edit: FC<DialogComponentProps> = ({
   taskID,
   setTasks,
 }) => {
+  const { data: session } = useSession();
   const [newEditTask, setNewEditTask] = useState("");
   const [editNumPomodoros, setEditNumPomodoros] = useState("1");
 
@@ -49,8 +51,41 @@ const Edit: FC<DialogComponentProps> = ({
           : task
       )
     );
+    saveEditData({
+      id: taskID,
+      text: newEditTask.trim(),
+      completed: false,
+      numPomodoro: Number(editNumPomodoros),
+    });
 
     onClose();
+  };
+
+  const saveEditData = async (task: Task) => {
+    if (session?.user) {
+      try {
+        const res = await fetch("/api/tasks", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: task.id,
+            userid: session.user.id,
+            text: task.text,
+            completed: task.completed,
+            numPomodoro: task.numPomodoro,
+          }),
+        });
+
+        if (!res.ok) {
+          alert("Error editing task");
+        }
+      } catch (error) {
+        console.error("Error editing task:", error);
+        alert("Error editing task");
+      }
+    }
   };
 
   return (
