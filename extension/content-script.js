@@ -30,9 +30,3 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
     }
     return true;
 });
-
-window.addEventListener("beforeunload", () => {
-    if (reconnectTimeout) {
-        clearTimeout(reconnectTimeout);
-    }
-});
