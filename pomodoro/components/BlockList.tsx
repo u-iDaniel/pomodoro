@@ -53,8 +53,11 @@ export default function BlockList() {
 
   return (
     <Box sx={{ width: '100%', maxWidth: 500, bgcolor: 'grey.100', color: 'black', margin: 'auto', mt: 4, border: '1px solid', borderColor: 'divider', borderRadius: 1, mb: 4 }}>
-      <Typography variant="h6" sx={{ p: 2 }}>
-        blocked distracting websites
+      <Typography variant="h4" sx={{ p: 2 }}>
+        block distracting websites
+      </Typography>
+      <Typography variant="body2" sx={{ p: 2 }}>
+        add websites you find distracting to this list. these websites will be blocked during your pomodoro sessions.
       </Typography>
       <Divider />
       <Box sx={{ p: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
@@ -67,7 +70,17 @@ export default function BlockList() {
           fullWidth
           autoComplete='off'
           size="small"
-          sx={{ input: { color: 'black' } }}
+          sx={{
+            input: { color: 'black' },
+            '& .MuiInputLabel-root': {
+              color: 'grey.700',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: 'grey.500',
+              },
+            },
+          }}
         />
         <Button variant="contained" onClick={handleAddSite}>
           add
