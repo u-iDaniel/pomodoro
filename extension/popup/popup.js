@@ -7,8 +7,11 @@ const buttonTextEl = document.getElementById('button-text');
 const inactiveDiv = document.getElementById('inactive');
 const inactiveTextEl = document.getElementById('inactive-text');
 
-// let isActive = false;
-
+/**
+ * Converts a camelCase string to a spaced lowercase string.
+ * @param {string} text - The camelCase text to convert.
+ * @returns {string} The converted text.
+ */
 // Converts camelCase to spaced lowercase (e.g. "shortBreak" -> "short break")
 function convertCamelCaseToSpaced(text) {
     let textArr = text.split("");
@@ -20,12 +23,21 @@ function convertCamelCaseToSpaced(text) {
     return textArr.join("");
 }
 
+/**
+ * Updates the state of the start/pause button in the popup.
+ * @param {boolean} active - Whether the timer is active.
+ */
 function updateButtonState(active) {
     buttonIconSVGEl.setAttribute('src', active ? './pause.svg' : './start.svg');
     buttonTextEl.textContent = active ? 'pause' : 'start';
     active ? buttonEl.classList.add('button-box-shadow') : buttonEl.classList.remove('button-box-shadow');
 }
 
+/**
+ * Listens for changes in chrome storage and updates the popup UI accordingly.
+ * @param {object} changes - The object containing the changed storage items.
+ * @param {string} area - The name of the storage area ('local', 'sync', etc.).
+ */
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes.currentTimer && changes.currentTimer?.newValue) {
         timerEl.textContent = changes.currentTimer.newValue;
@@ -50,6 +62,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
 });
 
+/**
+ * Handles the click event for the timer button, sending a message to the content script to toggle the timer.
+ */
 buttonEl.addEventListener('click', () => {
     chrome.tabs.query({ url: pomoAIWebsitePatterns }, (tabs) => {
         if (tabs.length > 0) {
@@ -60,6 +75,9 @@ buttonEl.addEventListener('click', () => {
     });
 });
 
+/**
+ * Initializes the popup's state when the DOM is fully loaded by retrieving data from chrome storage.
+ */
 document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.get(['isPomoAITabPresent', 'isTooManyPomoAITabs', 'currentTimer', 'currentMode', 'isActive', 'isTimerPresent'], (result) => {
         if (result.currentTimer) {
