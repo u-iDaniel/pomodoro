@@ -9,6 +9,7 @@ import Settings from "./Settings";
 import Link from "next/link";
 import "@fontsource/montserrat/200.css";
 import { useRouter } from "next/navigation";
+import TaskButton from "./TaskButton";
 
 interface NavbarProps {
   title: string;
@@ -40,7 +41,6 @@ export default function Navbar({ title, titleHref = "/" }: NavbarProps) {
 
 
         <div className="flex gap-5">
-          
           <Button
               startIcon={<AppBlocking />}
               sx={{
@@ -53,6 +53,8 @@ export default function Navbar({ title, titleHref = "/" }: NavbarProps) {
             >
               block list
           </Button>
+
+          <TaskButton />
 
           <Button
             startIcon={<SettingsIcon />}

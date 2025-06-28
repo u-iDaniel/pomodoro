@@ -36,17 +36,17 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
 
   const [pomodoro, setPomodoro] = useState(() => {
     const stored = localStorage.getItem("pomodoroTime");
-    return stored ? Number(stored) : 25; // Default 25 minutes
+    return stored ? stored : "25"; // Default 25 minutes
   });
 
   const [shortBreak, setShortBreak] = useState(() => {
     const stored = localStorage.getItem("shortBreakTime");
-    return stored ? Number(stored) : 5; // Default 5 minutes
+    return stored ? stored : "5"; // Default 5 minutes
   });
 
   const [longBreak, setLongBreak] = useState(() => {
     const stored = localStorage.getItem("longBreakTime");
-    return stored ? Number(stored) : 15; // Default 15 minutes
+    return stored ? stored : "15"; // Default 15 minutes
   });
 
   const handleSave = () => {
@@ -62,11 +62,11 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
 
     // Convert to seconds for the timer
     if (currentMode === "pomodoro") {
-      setTimeLeft(Math.round(pomodoro * 60));
+      setTimeLeft(Math.round(Number(pomodoro) * 60));
     } else if (currentMode === "shortBreak") {
-      setTimeLeft(Math.round(shortBreak * 60));
+      setTimeLeft(Math.round(Number(shortBreak) * 60));
     } else {
-      setTimeLeft(Math.round(longBreak * 60));
+      setTimeLeft(Math.round(Number(longBreak) * 60));
     }
 
     setIsActive(false); // Stop the timer when settings are saved
@@ -113,7 +113,7 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
           <ListItem sx={{ display: "block", padding: "0" }}>
             <ListItemText primary="pomodoro" />
             <TextField
-              type="number"
+              type="text"
               variant="filled"
               value={pomodoro}
               onKeyDown={(e) => {
@@ -122,13 +122,18 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
                 }
               }}
               onChange={(e) => {
-                if (e.target.value === "") {
-                  setPomodoro(0);
+                const val = e.target.value;
+
+                if (/^\d*\.?\d*$/.test(val)) {
+                  setPomodoro(val);
+                }
+              }}
+              onBlur={() => {
+                // Normalize the number on blur (e.g., turn "1." into "1")
+                if (pomodoro === "" || isNaN(Number(pomodoro))) {
+                  setPomodoro("25");
                 } else {
-                  const value = Number(e.target.value);
-                  if (!isNaN(value) && value >= 0) {
-                    setPomodoro(value);
-                  }
+                  setPomodoro(pomodoro);
                 }
               }}
               sx={{
@@ -152,7 +157,7 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
           <ListItem sx={{ display: "block", padding: "0" }}>
             <ListItemText primary="short break" />
             <TextField
-              type="number"
+              type="text"
               variant="filled"
               value={shortBreak}
               onKeyDown={(e) => {
@@ -161,13 +166,17 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
                 }
               }}
               onChange={(e) => {
-                if (e.target.value === "") {
-                  setShortBreak(0);
+                const val = e.target.value;
+
+                if (/^\d*\.?\d*$/.test(val)) {
+                  setShortBreak(val);
+                }
+              }}
+              onBlur={() => {
+                if (shortBreak === "" || isNaN(Number(shortBreak))) {
+                  setShortBreak("5");
                 } else {
-                  const value = Number(e.target.value);
-                  if (!isNaN(value) && value >= 0) {
-                    setShortBreak(value);
-                  }
+                  setShortBreak(shortBreak);
                 }
               }}
               sx={{
@@ -190,7 +199,7 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
           <ListItem sx={{ display: "block", padding: "0" }}>
             <ListItemText primary="long break" />
             <TextField
-              type="number"
+              type="text"
               variant="filled"
               value={longBreak}
               onKeyDown={(e) => {
@@ -199,13 +208,17 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
                 }
               }}
               onChange={(e) => {
-                if (e.target.value === "") {
-                  setLongBreak(0);
+                const val = e.target.value;
+
+                if (/^\d*\.?\d*$/.test(val)) {
+                  setLongBreak(val);
+                }
+              }}
+              onBlur={() => {
+                if (longBreak === "" || isNaN(Number(longBreak))) {
+                  setLongBreak("15");
                 } else {
-                  const value = Number(e.target.value);
-                  if (!isNaN(value) && value >= 0) {
-                    setLongBreak(value);
-                  }
+                  setLongBreak(longBreak);
                 }
               }}
               sx={{

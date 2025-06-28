@@ -46,7 +46,9 @@ export default function Timer() {
   );
   const [hasBeenAcknowledged, setHasBeenAcknowledged] = useState(true);
 
-  const [pomodoroClicked, setPomodoroClicked] = useState(currentMode === "pomodoro");
+  const [pomodoroClicked, setPomodoroClicked] = useState(
+    currentMode === "pomodoro"
+  );
   const [shortBreakClicked, setShortBreakClicked] = useState(false);
   const [longBreakClicked, setLongBreakClicked] = useState(false);
 
@@ -167,7 +169,7 @@ export default function Timer() {
         if (newCount === 4) {
           sendNotification("you have done 4 pomodoros, take a long break!");
           setTimeout(() => {
-            setTimeLeft(longBreakTime * 60);
+            setTimeLeft(Math.round(Number(longBreakTime) * 60));
             setMode("longBreak");
             setShortBreakClicked(false);
             setPomodoroClicked(false);
@@ -178,7 +180,7 @@ export default function Timer() {
         } else {
           sendNotification("pomodoro complete! take a short break.");
           setTimeout(() => {
-            setTimeLeft(shortBreakTime * 60);
+            setTimeLeft(Math.round(Number(shortBreakTime) * 60));
             setMode("shortBreak");
             setShortBreakClicked(true);
             setPomodoroClicked(false);
@@ -191,7 +193,7 @@ export default function Timer() {
     } else if (currentMode === "shortBreak") {
       sendNotification("short break is over! time to start a pomodoro.");
       setTimeout(() => {
-        setTimeLeft(pomodoroTime * 60);
+        setTimeLeft(Math.round(Number(pomodoroTime) * 60));
         setMode("pomodoro");
         setShortBreakClicked(false);
         setPomodoroClicked(true);
@@ -201,7 +203,7 @@ export default function Timer() {
     } else if (currentMode === "longBreak") {
       sendNotification("long break is over! time to start a pomodoro.");
       setTimeout(() => {
-        setTimeLeft(pomodoroTime * 60);
+        setTimeLeft(Math.round(Number(pomodoroTime) * 60));
         setPomodoroCount(0);
         setMode("pomodoro");
         setShortBreakClicked(false);
@@ -251,7 +253,7 @@ export default function Timer() {
     setShortBreakClicked(false);
     setLongBreakClicked(false);
     setIsActive(false);
-    setTimeLeft(pomodoroTime * 60);
+    setTimeLeft(Math.round(Number(pomodoroTime) * 60));
     setMode("pomodoro");
   }, [pomodoroTime, setIsActive, setTimeLeft, setMode]);
 
@@ -264,7 +266,7 @@ export default function Timer() {
     setPomodoroClicked(false);
     setLongBreakClicked(false);
     setIsActive(false);
-    setTimeLeft(shortBreakTime * 60);
+    setTimeLeft(Math.round(Number(shortBreakTime) * 60));
     setMode("shortBreak");
   }, [setIsActive, setMode, setTimeLeft, shortBreakTime]);
 
@@ -273,7 +275,7 @@ export default function Timer() {
     setShortBreakClicked(false);
     setPomodoroClicked(false);
     setIsActive(false);
-    setTimeLeft(longBreakTime * 60);
+    setTimeLeft(Math.round(Number(longBreakTime) * 60));
     setMode("longBreak");
   }, [longBreakTime, setIsActive, setTimeLeft, setMode]);
 
