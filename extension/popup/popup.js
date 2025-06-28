@@ -36,6 +36,18 @@ chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes.isActive && changes.isActive?.newValue !== undefined) {
         updateButtonState(changes.isActive.newValue);
     }
+    if (area === 'local' && changes.isTimerPresent && changes.isTimerPresent?.newValue !== undefined) {
+        if (!changes.isTimerPresent.newValue) {
+            buttonEl.disabled = true;
+            buttonEl.classList.add('button-disabled');
+            inactiveDiv.style.display = 'block';
+            inactiveTextEl.textContent = 'to start/pause the timer please go to the timer screen on the pomoAI website';
+        } else {
+            buttonEl.disabled = false;
+            buttonEl.classList.remove('button-disabled');
+            inactiveDiv.style.display = 'none';
+        }
+    }
 });
 
 buttonEl.addEventListener('click', () => {
@@ -49,7 +61,7 @@ buttonEl.addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    chrome.storage.local.get(['isPomoAITabPresent', 'isTooManyPomoAITabs', 'currentTimer', 'currentMode', 'isActive'], (result) => {
+    chrome.storage.local.get(['isPomoAITabPresent', 'isTooManyPomoAITabs', 'currentTimer', 'currentMode', 'isActive', 'isTimerPresent'], (result) => {
         if (result.currentTimer) {
             timerEl.textContent = result.currentTimer;
         }
@@ -62,9 +74,18 @@ document.addEventListener('DOMContentLoaded', () => {
             updateButtonState(result.isActive);
         }
 
-        if (result.isPomoAITabPresent) {
+        if (!result.isTimerPresent) {
+            buttonEl.disabled = true;
+            buttonEl.classList.add('button-disabled');
+            inactiveDiv.style.display = 'block';
+            inactiveTextEl.textContent = 'to start/pause the timer please go to the timer screen on the pomoAI website';
+        }
+
+        if (result.isPomoAITabPresent && result.isTimerPresent) {
             inactiveDiv.style.display = 'none';
-        } else {
+            buttonEl.disabled = false;
+            buttonEl.classList.remove('button-disabled');
+        } else if (!result.isPomoAITabPresent) {
             inactiveDiv.style.display = 'block';
             timerEl.textContent = 'xx:xx';
             modeEl.textContent = '';
