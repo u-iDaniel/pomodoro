@@ -36,6 +36,7 @@ export default function Timer() {
   // Use refs to track state safely
   const isInitialMount = useRef(true);
   const timerCompleteHandled = useRef(false);
+  const workerRef = useRef<Worker | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pomodoroCount, setPomodoroCount] = useState(0);
@@ -103,6 +104,55 @@ export default function Timer() {
     }
   }, [session]);
 
+  // Timer countdown effect (uses web worker to prevent timer slowing down when tab is in background)
+  useEffect(() => {
+    // Initialize worker on first mount
+    if (!workerRef.current) {
+      const workerUrl = new URL('../public/timerWorker.js', import.meta.url); // has to be js to be loaded in the browser (typescript will not work)
+      workerRef.current = new Worker(workerUrl);
+      // Receives messages from the worker and sets timeLeft
+      workerRef.current.onmessage = (e) => {
+        const { timeLeft: newTimeLeft } = e.data;
+        setTimeLeft(newTimeLeft as number);
+      };
+    }
+
+    if (isActive && timeLeft > 0) {
+      // Post message to worker to start countdown
+      workerRef.current.postMessage({ 
+        action: "START",
+        timeLeft: Math.round(timeLeft),
+      });
+    } else if (!isActive && timeLeft > 0) {
+      // Post message to worker to pause countdown
+      workerRef.current.postMessage({
+        action: "PAUSE",
+        timeLeft: Math.round(timeLeft),
+      });
+    }
+  }, [isActive, setTimeLeft, timeLeft]);
+
+  // Send over timer state to chrome extension
+  useEffect(() => {
+    window.postMessage({
+      type: "TIMER",
+      action: "UPDATE",
+      mode: currentMode,
+      timeLeft: timeFormat(timeLeft),
+      isActive: isActive,
+    });
+}, [currentMode, isActive, timeFormat, timeLeft]);
+  
+  // Cleanup worker on unmount
+  useEffect(() => {
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+        workerRef.current = null;
+      }
+    };
+  }, []);
+  
   // Handle timer completion
   const handleTimerComplete = useCallback(() => {
     if (timerCompleteHandled.current) return;
@@ -175,19 +225,6 @@ export default function Timer() {
     playSound,
   ]);
 
-  // Timer countdown effect
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (isActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prevTimeLeft: number) => prevTimeLeft - 1);
-      }, 1000);
-    }
-
-    return () => clearInterval(interval);
-  }, [isActive, setTimeLeft, timeLeft]);
-
   // Timer complete check effect - separate from main countdown
   useEffect(() => {
     // Skip first render
@@ -208,6 +245,7 @@ export default function Timer() {
       timerCompleteHandled.current = false;
     }
   }, [timeLeft]);
+
 
   // Event handler functions
   const pomodoroTimer = useCallback(() => {
@@ -230,7 +268,7 @@ export default function Timer() {
     setIsActive(false);
     setTimeLeft(Math.round(Number(shortBreakTime) * 60));
     setMode("shortBreak");
-  }, [shortBreakTime, setIsActive, setTimeLeft, setMode]);
+  }, [setIsActive, setMode, setTimeLeft, shortBreakTime]);
 
   const toggleLongBreak = useCallback(() => {
     setLongBreakClicked(true);
@@ -314,6 +352,7 @@ export default function Timer() {
         </Grid>
 
         <div
+          id="page-timer"
           style={{
             fontFamily: "Montserrat, Arial, sans",
             fontWeight: "300",
@@ -325,6 +364,7 @@ export default function Timer() {
         </div>
 
         <button
+          id="pomoai-timer-button"
           onClick={toggleTimer}
           style={{
             width: "250px",

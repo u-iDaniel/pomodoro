@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --background: linear-gradient(180deg, #2697A3 0%, #C2BFC0 100%);
+  --foreground: #ededed;
+  --secondary: #DE8421;
+  --tertiary: #8421DE;
+  --success: #21DE84;
+  --warning: #DE3721;
+  --off-white: #D9D9D9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: linear-gradient(180deg, #2697A3 0%, #C2BFC0 100%);
+    --foreground: #ededed;
+    --secondary: #DE8421;
+    --tertiary: #8421DE;
+    --success: #21DE84;
+    --warning: #852215;
+  }
+}
+
+body {  
+  width: 250px;
+  height: 250px;
+  color: var(--foreground);
+  background-image: var(--background);
+  font-family: "Montserrat", Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 20px;
+}
+
+#timer {
+  font-size: 4rem;
+  font-weight: 300;
+}
+
+#timer-button {
+  background: transparent;
+  border: 2px solid var(--off-white);
+  color: #FFFFFF;
+  padding: 12px 36px;
+  border-radius: 1000px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 150px;
+  height: 50px;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.button-box-shadow {
+  box-shadow: rgb(236, 247, 236) 0px 0px 10px;
+}
+
+.button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#inactive {
+  color: white;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+p#mode {
+  font-size: 1.2rem;
+}
