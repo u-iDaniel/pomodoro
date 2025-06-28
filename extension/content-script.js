@@ -32,7 +32,6 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
 });
 
 window.addEventListener("beforeunload", () => {
-    port.disconnect();
     if (reconnectTimeout) {
         clearTimeout(reconnectTimeout);
     }
