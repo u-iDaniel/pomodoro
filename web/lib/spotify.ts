@@ -68,6 +68,11 @@ export async function getUserPlaylists(userAccessToken: string, userId: string) 
       }
     });
 
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to fetch playlists from Spotify: ${response.status} - ${errorText}`);
+  }
+
   const data = await response.json();
   if (!data.items) {
     throw new Error('No playlists found for this user');
@@ -89,7 +94,8 @@ export async function getUserId(userAccessToken: string) {
   });
   const data = await response.json();
   if (!data.id) {
-    throw new Error('Failed to retrieve user ID');
+    const errorText = await response.text();
+    throw new Error(`Failed to retrieve user ID: ${response.status} - ${errorText}`);
   }
   return data.id;
 }

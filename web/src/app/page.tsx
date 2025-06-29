@@ -20,7 +20,7 @@ export default function Home() {
         <div style={{ position: "relative" }}>
           <Timer />
 
-          {session ? (
+          {session?.user ? (
             <div
               style={{
                 position: "absolute",

@@ -12,10 +12,12 @@ interface Playlist {
   imageUrl: string;
 }
 
-export default function MusicPlayer() {
+// Only works if user is registered on the Spotify app developer dashboard :(
+export default function UserMusicPlayer() {
   const searchParams = useSearchParams();
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,8 +61,9 @@ export default function MusicPlayer() {
 
           const data: Playlist[] = await response.json();
           setPlaylists(data);
-        } catch (err: any) {
-          setError(err?.message);
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+          setError(errorMessage);
           console.error(err);
         } finally {
           setIsLoading(false);
@@ -73,6 +76,14 @@ export default function MusicPlayer() {
   
   const handleSpotifySignIn = async () => {
     window.location.href = "/api/spotify/signin";
+  };
+
+  const handlePlaylistClick = (playlist: Playlist) => {
+    setSelectedPlaylist(playlist);
+  };
+
+  const handleBackToPlaylists = () => {
+    setSelectedPlaylist(null);
   };
 
   return (
@@ -117,16 +128,55 @@ export default function MusicPlayer() {
           <CircularProgress color="inherit" />
         ) : error ? (
           <Typography color="error">Error: {error}</Typography>
+        ) : selectedPlaylist ? (
+          // Show playlist embed
+          <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Button
+                onClick={handleBackToPlaylists}
+                sx={{ color: 'white', minWidth: 'auto', p: 1, mr: 1 }}
+              >
+                ←
+              </Button>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'white' }}>
+                {selectedPlaylist.name}
+              </Typography>
+            </Box>
+            <Box sx={{ flexGrow: 1, borderRadius: '12px', overflow: 'hidden' }}>
+              <iframe
+                src={`https://open.spotify.com/embed/playlist/${selectedPlaylist.id}?theme=0`}
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                allowFullScreen
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                style={{ borderRadius: '12px' }}
+              />
+            </Box>
+          </Box>
         ) : (
+          // Show playlist list
           <List sx={{ width: '100%' }}>
             {playlists.map((playlist) => (
-              <ListItem key={playlist.id} sx={{ borderRadius: '8px', mb: 1 }}>
+              <ListItem 
+                key={playlist.id} 
+                sx={{ 
+                  borderRadius: '8px', 
+                  mb: 1, 
+                  cursor: 'pointer',
+                  '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
+                }}
+                onClick={() => handlePlaylistClick(playlist)}
+              >
                 <ListItemAvatar>
                   <Avatar variant="rounded" src={playlist.imageUrl} alt={playlist.name} />
                 </ListItemAvatar>
                 <ListItemText primary={playlist.name} secondary={playlist.description || 'No description'} 
-                  primaryTypographyProps={{ color: 'white', fontWeight: 'bold', noWrap: true }}
-                  secondaryTypographyProps={{ color: 'rgba(255, 255, 255, 0.7)', noWrap: true }}
+                  slotProps={{
+                    primary: { color: 'white', fontWeight: 'bold', noWrap: true },
+                    secondary: { color: 'rgba(255, 255, 255, 0.7)', noWrap: true }
+                  }}
                 />
               </ListItem>
             ))}
