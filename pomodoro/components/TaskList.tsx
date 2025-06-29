@@ -328,10 +328,11 @@ export default function TaskList() {
           <div className="p-2">or</div>
           <button
             onClick={handleAIOpen}
-            className="relative bg-gradient-to-r from-[#00d4ff] to-[#90f7ec] text-black border-2 border-black rounded-2xl px-5 py-2 font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-[0_4px_15px_rgba(0,212,255,0.5)] overflow-hidden"
+            className="relative gleam-button bg-gradient-to-r from-[#00d4ff] to-[#90f7ec] text-black border-2 border-black rounded-2xl px-5 py-2 font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_25px_rgba(0,212,255,0.8)] overflow-hidden"
           >
             ✨generate with ai
           </button>
+
           <div className="text-2xl p-2">your tasks:</div>
           <Divider />
           <ul className="max-h-[50vh] overflow-y-auto">
@@ -388,6 +389,7 @@ export default function TaskList() {
             onClose={handleEditClose}
             taskID={editTaskID}
             setTasks={setTasks}
+            tasks={tasks}
           />
           <Generate open={openAI} onClose={handleAIClose} setTasks={setTasks} />
         </div>

@@ -170,7 +170,9 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
             generate
           </button>
         </DialogActions>
-        <div className="text-center">note: this will delete existing tasks</div>
+        <div className="text-center">
+          note: this will replace existing tasks
+        </div>
       </DialogContent>
     </Dialog>
   );

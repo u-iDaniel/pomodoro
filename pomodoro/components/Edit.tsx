@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -19,6 +19,7 @@ interface DialogComponentProps {
   onClose: () => void;
   taskID: number;
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  tasks: Task[];
 }
 
 interface Task {
@@ -33,6 +34,7 @@ const Edit: FC<DialogComponentProps> = ({
   onClose,
   taskID,
   setTasks,
+  tasks,
 }) => {
   const { data: session } = useSession();
   const [newEditTask, setNewEditTask] = useState("");
@@ -87,6 +89,16 @@ const Edit: FC<DialogComponentProps> = ({
       }
     }
   };
+
+  useEffect(() => {
+    if (open) {
+      const task = tasks.find((t) => t.id === taskID);
+      if (task) {
+        setNewEditTask(task.text);
+        setEditNumPomodoros(String(task.numPomodoro));
+      }
+    }
+  }, [open, taskID, tasks]);
 
   return (
     <Dialog open={open} onClose={onClose}>
