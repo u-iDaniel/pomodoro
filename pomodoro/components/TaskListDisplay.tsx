@@ -90,7 +90,6 @@ export default function TaskListDisplay() {
           alert("Error loading tasks");
         } else {
           const data = await res.json();
-          console.log("Setting tasks...");
           setTasks(data.task_list);
         }
       } catch (error) {

@@ -10,7 +10,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import "@fontsource/montserrat/200.css";
-import { GoogleGenAI } from "@google/genai";
+import { useSession } from "next-auth/react";
 
 import TextField from "@mui/material/TextField";
 
@@ -28,39 +28,84 @@ interface DialogComponentProps {
 }
 
 const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
+  const { data: session } = useSession();
   const [generateText, setGenerateText] = useState("");
 
-  const genAI = new GoogleGenAI({
-    apiKey: process.env.NEXT_PUBLIC_API_KEY,
-  });
-
-  const prompt = `This is the user's task description ${generateText}. Split this large task into a task list and format it into a JSON string format like [{"id":1750653019051,"text":"task","completed":false,"numPomodoro":1},{"id":1750653021634,"text":"math","completed":false,"numPomodoro":1},{"id":1750653024530,"text":"physics","completed":false,"numPomodoro":1}] with a random task id, the task as the ID, completed as false, and recommended number of pomodoros. Only return the JSON string, nothing else in your response.`;
-
   const generateResponse = async () => {
-    const response = await genAI.models.generateContent({
-      model: "gemini-1.5-flash",
-      contents: prompt,
-    });
-    if (
-      response.candidates &&
-      response.candidates.length > 0 &&
-      response.candidates[0].content &&
-      response.candidates[0].content.parts
-    ) {
-      const generatedText = response.candidates[0].content.parts
-        .map((part) => part.text)
-        .join("");
-      const cleaned = generatedText
-        .replace(/```json/, "")
-        .replace(/```/, "")
-        .trim();
-      const parsedTasks = JSON.parse(cleaned) as Task[];
-      setTasks(parsedTasks);
+    deleteAllTasks();
+    try {
+      const pomodoroTime = localStorage.getItem("pomodoroTime");
+      const res = await fetch("/api/gemini", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          generateText,
+          pomodoroTime,
+        }),
+      });
+
+      if (!res.ok) {
+        alert("Error generating tasks");
+      }
+      loadData();
+    } catch (error) {
+      console.error("Error generating tasks:", error);
+      alert("Error generating tasks");
     }
+
     setTimeout(() => {
       onClose();
     }, 10);
   };
+
+  const loadData = async () => {
+    if (session?.user) {
+      try {
+        const res = await fetch("/api/tasks", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          alert("Error loading tasks");
+        } else {
+          const data = await res.json();
+          setTasks(data.task_list);
+        }
+      } catch (error) {
+        console.error("Error loading tasks:", error);
+        alert("Error loading tasks");
+      }
+    }
+  };
+
+  const deleteAllTasks = async () => {
+    if (session?.user) {
+      try {
+        const res = await fetch("/api/tasks", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userid: session.user.id,
+          }),
+        });
+
+        if (!res.ok) {
+          alert("Error deleting all tasks");
+        }
+      } catch (error) {
+        console.error("Error deleting all tasks:", error);
+        alert("Error deleting all tasks");
+      }
+    }
+  };
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogActions sx={{ backgroundColor: "white", color: "#000000" }}>
@@ -125,6 +170,7 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
             generate
           </button>
         </DialogActions>
+        <div className="text-center">note: this will delete existing tasks</div>
       </DialogContent>
     </Dialog>
   );

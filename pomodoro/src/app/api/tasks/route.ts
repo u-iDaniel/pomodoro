@@ -94,7 +94,6 @@ export async function DELETE(req: Request) {
 
     try {
         const task_id = String(task.id);
-        console.log(task_id);
         const delete_task = await prisma.task.delete({
             where: {
                 taskid: task_id,
@@ -108,7 +107,6 @@ export async function DELETE(req: Request) {
     }
 } else {
     try {
-        console.log(session.user.id);
         const delete_task = await prisma.task.deleteMany({
             where: {
                 userid: session.user.id,

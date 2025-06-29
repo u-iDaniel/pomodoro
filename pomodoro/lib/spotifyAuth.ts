@@ -29,8 +29,6 @@ export async function getValidToken(): Promise<string> {
     body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
   });
 
-  console.log(response);
-
   if (!response.ok) {
     throw new Error('Failed to get Spotify token');
   }

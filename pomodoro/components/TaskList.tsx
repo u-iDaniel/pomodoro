@@ -7,6 +7,7 @@ import Edit from "../components/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import Generate from "../components/Generate";
 import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 interface Task {
   id: number;
@@ -33,6 +34,9 @@ export default function TaskList() {
   const [openAI, setOpenAI] = useState(false);
 
   const handleAIOpen = () => {
+    if (!session?.user) {
+      redirect("/login");
+    }
     setOpenAI(true);
   };
 
@@ -232,7 +236,6 @@ export default function TaskList() {
           alert("Error loading tasks");
         } else {
           const data = await res.json();
-          console.log("Setting tasks...");
           setTasks(data.task_list);
         }
       } catch (error) {
