@@ -1,6 +1,5 @@
 "use client";
 import { signIn, useSession } from "next-auth/react";
-import { Button } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
