@@ -10,7 +10,7 @@
   --background: linear-gradient(180deg, #2697A3 0%, #C2BFC0 100%);
   --foreground: #171717;
   --secondary: #DE8421;
-  --tertiary: #8421DE;
+  --tertiary: linear-gradient(180deg, #8432F5 0%, #56BFE6 100%);
   --success: #21DE84;
   --warning: #DE3721;
 }
@@ -20,7 +20,7 @@
     --background: linear-gradient(180deg, #2697A3 0%, #C2BFC0 100%);
     --foreground: #ededed;
     --secondary: #DE8421;
-    --tertiary: #8421DE;
+    --tertiary: linear-gradient(180deg, #8432F5 0%, #56BFE6 100%);
     --success: #21DE84;
     --warning: #DE3721;
   }

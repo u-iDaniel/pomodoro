@@ -1,26 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid2";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
-import { useSession } from "next-auth/react";
-import Slide from "@mui/material/Slide";
 import { useTimer } from "@/components/TimerContext";
-import Link from "next/link";
 import "@fontsource/montserrat/300.css";
 import "@fontsource/montserrat/200.css";
 
-interface UserPreference {
-  predictedGenre: string;
-  spotifyTrackId: string;
-}
-
 export default function Timer() {
-  const { data: session } = useSession();
   const {
     timeLeft,
     setTimeLeft,
@@ -41,9 +30,6 @@ export default function Timer() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pomodoroCount, setPomodoroCount] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [userPreference, setUserPreference] = useState<UserPreference | null>(
-    null
-  );
   const [hasBeenAcknowledged, setHasBeenAcknowledged] = useState(true);
 
   const [pomodoroClicked, setPomodoroClicked] = useState(
@@ -82,27 +68,6 @@ export default function Timer() {
       Notification.requestPermission();
     }
   }, []);
-
-  // Fetch user preferences
-  useEffect(() => {
-    if (session?.user) {
-      const fetchPreferences = async () => {
-        try {
-          const response = await fetch("/api/preferences");
-          const data = await response.json();
-          if (data.preference) {
-            setUserPreference({
-              predictedGenre: data.preference.predictedGenre,
-              spotifyTrackId: data.preference.spotifyTrackId,
-            });
-          }
-        } catch (error) {
-          console.error("Error fetching preferences:", error);
-        }
-      };
-      fetchPreferences();
-    }
-  }, [session]);
 
   // Timer countdown effect (uses web worker to prevent timer slowing down when tab is in background)
   useEffect(() => {
@@ -279,11 +244,6 @@ export default function Timer() {
     setMode("longBreak");
   }, [longBreakTime, setIsActive, setTimeLeft, setMode]);
 
-  const handleDialogClose = useCallback(() => {
-    setDropdownOpen(false);
-    setHasBeenAcknowledged(true);
-  }, []);
-
   return (
     <>
       <Box
@@ -384,77 +344,7 @@ export default function Timer() {
           {isActive ? <PauseIcon /> : <PlayArrowIcon />}
           {isActive ? "pause" : "start"}
         </button>
-
-        {session ? (
-          ""
-        ) : (
-          <div
-            style={{
-              fontFamily: "Montserrat, Arial, sans",
-              fontWeight: "200",
-              color: "white",
-              marginTop: "50px",
-            }}
-          >
-            want AI personalized break recommendations?{" "}
-            <Link className="underline" href={"/login"}>
-              sign up
-            </Link>
-          </div>
-        )}
       </Box>
-
-      {/* Break AI recommendation pop-up */}
-
-      <Slide direction="up" in={dropdownOpen} mountOnEnter unmountOnExit>
-        <Box
-          sx={{
-            position: "fixed",
-            top: "70%",
-            right: "5%",
-            width: 350,
-            bgcolor: "#8421DE",
-            p: 2,
-            borderRadius: 2,
-            boxShadow: 3,
-            color: "white",
-          }}
-        >
-          <Typography variant="h6" fontWeight="bold">
-            break time! 🎉
-          </Typography>
-          <Typography variant="body1">
-            {currentMode === "pomodoro"
-              ? "break is over, back to work!"
-              : "Time for a short break!"}
-          </Typography>
-
-          {session && userPreference?.spotifyTrackId && (
-            <Box sx={{ mt: 2, mb: 2 }}>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                Recommended {userPreference.predictedGenre} track for your
-                break:
-              </Typography>
-              <iframe
-                src={`https://open.spotify.com/embed/track/${userPreference.spotifyTrackId}`}
-                width="100%"
-                height="80"
-                frameBorder="0"
-                allow="encrypted-media"
-                loading="lazy"
-              />
-            </Box>
-          )}
-
-          <Button
-            onClick={handleDialogClose}
-            variant="contained"
-            sx={{ mt: 1, backgroundColor: "#673AB7" }}
-          >
-            OK
-          </Button>
-        </Box>
-      </Slide>
     </>
   );
 }
