@@ -29,8 +29,6 @@ export default function Timer() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pomodoroCount, setPomodoroCount] = useState(0);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [hasBeenAcknowledged, setHasBeenAcknowledged] = useState(true);
 
   const [pomodoroClicked, setPomodoroClicked] = useState(
     currentMode === "pomodoro"
@@ -125,8 +123,6 @@ export default function Timer() {
     timerCompleteHandled.current = true;
 
     setIsActive(false);
-    setDropdownOpen(true);
-    setHasBeenAcknowledged(false);
 
     if (currentMode === "pomodoro") {
       setPomodoroCount((prevCount) => {
@@ -198,11 +194,10 @@ export default function Timer() {
       return;
     }
 
-    if (timeLeft === 0 && !dropdownOpen && hasBeenAcknowledged) {
-      timerCompleteHandled.current = false;
+    if (timeLeft === 0) {
       handleTimerComplete();
     }
-  }, [timeLeft, dropdownOpen, hasBeenAcknowledged, handleTimerComplete]);
+  }, [timeLeft, handleTimerComplete]);
 
   // Reset the timer complete flag when timeLeft changes from 0 to something else
   useEffect(() => {
