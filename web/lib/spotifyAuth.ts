@@ -5,6 +5,14 @@ interface SpotifyToken {
   expires_at: number;
 }
 
+interface SpotifyUserToken {
+  access_token: string;
+  token_type: string;
+  scope: string;
+  expires_in: number;
+  refresh_token: string;
+}
+
 let tokenData: SpotifyToken | null = null;
 
 export async function getValidToken(): Promise<string> {
@@ -45,3 +53,26 @@ export async function getValidToken(): Promise<string> {
 
   return tokenData!.access_token;
 }
+
+export async function getValidUserToken(code: string, redirectUri: string): Promise<SpotifyUserToken> {
+  const response = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString('base64')}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: redirectUri,
+    }).toString(),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to exchange code for token');
+  }
+
+  const data = await response.json();
+  return data as SpotifyUserToken;
+}
+  
