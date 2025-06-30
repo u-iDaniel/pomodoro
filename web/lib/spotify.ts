@@ -99,3 +99,21 @@ export async function getUserId(userAccessToken: string) {
   }
   return data.id;
 }
+
+export async function getPlaylist(playlistId: string): Promise<SimplifiedPlaylistObject | { notFound: true }> {
+  const accessToken = await getValidToken();
+  const response = await fetch(`${SPOTIFY_API}/playlists/${playlistId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      return { notFound: true };
+    }
+    throw new Error(`Failed to fetch playlist: ${response.status} - ${await response.text()}`);
+  }
+
+  return response.json();
+}
