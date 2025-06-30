@@ -9,7 +9,6 @@ export async function GET(req: NextRequest) {
     }
 
     const userAccessToken = authHeader.split(' ')[1];
-    console.log('User Access Token:', userAccessToken);
 
     // Use the access token to get the user's Spotify ID
     const userId = await getUserId(userAccessToken);
