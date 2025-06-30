@@ -93,7 +93,7 @@ export default function MusicPlayer() {
       sx={{
         width: 450,
         height: isCollapsed ? "auto" : submittedPlaylistId ? 700 : "auto",
-        maxHeight: isCollapsed ? 65 : 700,
+        maxHeight: 700,
         background: "var(--tertiary)",
         borderRadius: "20px",
         p: 2,
