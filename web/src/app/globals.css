@@ -37,4 +37,5 @@ body {
   color: var(--foreground);
   background: var(--background) fixed no-repeat;
   font-family: "Montserrat", Arial, sans-serif;
+  overflow-x: clip; /* Prevent horizontal scroll for task list display */
 }
