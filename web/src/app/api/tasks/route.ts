@@ -20,6 +20,18 @@ export async function POST(req: Request) {
     try {
         const task: Task = await req.json(); // Extract all data from task
 
+        if (
+            !task ||
+            typeof task.id !== "number" ||
+            typeof task.text !== "string" ||
+            task.text.trim() === "" ||
+            typeof task.completed !== "boolean" ||
+            typeof task.numPomodoro !== "number" ||
+            task.numPomodoro < 0
+        ) {
+            return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+        }
+
         const task_id = String(task.id);
         const user_id = session.user.id!;
         const task_text = task.text;
@@ -91,6 +103,9 @@ export async function DELETE(req: Request) {
     const task = await req.json();
 
     if (task.id) {
+        if (typeof task.id !== "number") {
+            return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+        }
 
     try {
         const task_id = String(task.id);
@@ -131,6 +146,18 @@ export async function PATCH(req: Request) {
 
     try {
         const task: Task = await req.json(); // Extract all data from task
+
+        if (
+            !task ||
+            typeof task.id !== "number" ||
+            typeof task.text !== "string" ||
+            task.text.trim() === "" ||
+            typeof task.completed !== "boolean" ||
+            typeof task.numPomodoro !== "number" ||
+            task.numPomodoro < 0
+        ) {
+            return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+        }
 
         const task_id = String(task.id);
         const user_id = session.user.id!;

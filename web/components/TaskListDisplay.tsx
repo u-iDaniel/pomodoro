@@ -132,7 +132,7 @@ export default function TaskListDisplay() {
                     fontWeight: "200",
                   }}
                 >
-                  <CheckIcon />
+                  <CheckIcon aria-label="Mark task as complete" />
                 </button>
               </span>
               <Divider sx={{ backgroundColor: "white" }} />
