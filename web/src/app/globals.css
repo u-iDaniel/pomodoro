@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --background: linear-gradient(180deg, #2697A3 0%, #C2BFC0 100%);
+  --foreground: #171717;
+  --secondary: #DE8421;
+  --tertiary: linear-gradient(180deg, #8432F5 0%, #56BFE6 100%);
+  --success: #21DE84;
+  --warning: #DE3721;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: linear-gradient(180deg, #2697A3 0%, #C2BFC0 100%);
+    --foreground: #ededed;
+    --secondary: #DE8421;
+    --tertiary: linear-gradient(180deg, #8432F5 0%, #56BFE6 100%);
+    --success: #21DE84;
+    --warning: #DE3721;
+  }
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background) fixed no-repeat;
+  font-family: "Montserrat", Arial, sans-serif;
+  overflow-x: clip; /* Prevent horizontal scroll for task list display */
+}
+
+.gleam-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-20deg);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.gleam-button:hover::before {
+  animation: gleam 1.5s linear infinite;
+  opacity: 1;
+}
+
+@keyframes gleam {
+  0% {
+    left: -75%;
+  }
+  100% {
+    left: 125%;
+  }
+}
+
+
