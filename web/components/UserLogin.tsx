@@ -36,6 +36,11 @@ export default function UserLogin() {
     handleClose();
   };
 
+  const handlePricing = () => {
+    router.push("/pricing");
+    handleClose();
+  };
+
   return session ? (
     <>
       <div className="flex items-center gap-4">
@@ -49,6 +54,7 @@ export default function UserLogin() {
       </div>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <MenuItem onClick={handleEditPreferences}>edit preferences</MenuItem>
+        <MenuItem onClick={handlePricing}>pricing</MenuItem>
         <MenuItem onClick={handleSignOut}>sign out</MenuItem>
       </Menu>
     </>
