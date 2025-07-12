@@ -1,13 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
-import TextField from "@mui/material/TextField";
-import Divider from "@mui/material/Divider";
-import ClearIcon from "@mui/icons-material/Clear";
-import Edit from "../components/Edit";
-import CheckIcon from "@mui/icons-material/Check";
-import Generate from "../components/Generate";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import {
+  Box,
+  Typography,
+  TextField,
+  Divider,
+  Button,
+  IconButton,
+} from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
+import ClearIcon from "@mui/icons-material/Clear";
+import Edit from "../components/Edit";
+import Generate from "../components/Generate";
 
 interface Task {
   id: number;
@@ -40,10 +46,7 @@ export default function TaskList() {
     setOpenAI(true);
   };
 
-  const handleAIClose = () => {
-    setOpenAI(false);
-  };
-
+  const handleAIClose = () => setOpenAI(false);
   const handleEditOpen = (taskID: number) => {
     setEditTaskID(taskID);
     setOpen(true);
@@ -51,35 +54,32 @@ export default function TaskList() {
   const handleEditClose = () => setOpen(false);
 
   const addTask = () => {
-    if (newTask === "") {
-      return;
-    } else {
-      const new_id = Date.now();
-      const new_text = newTask.trim();
-      const new_completed = false;
-      const new_numPomodoro = Number(numPomodoros);
-      setTasks((prev) => [
-        ...prev,
-        {
-          id: new_id,
-          text: new_text,
-          completed: new_completed,
-          numPomodoro: new_numPomodoro,
-        },
-      ]);
-      saveTask({
+    if (newTask === "") return;
+    const new_id = Date.now();
+    const new_text = newTask.trim();
+    const new_completed = false;
+    const new_numPomodoro = Number(numPomodoros);
+
+    setTasks((prev) => [
+      ...prev,
+      {
         id: new_id,
         text: new_text,
         completed: new_completed,
         numPomodoro: new_numPomodoro,
-      });
-      setNewTask("");
-    }
+      },
+    ]);
+    saveTask({
+      id: new_id,
+      text: new_text,
+      completed: new_completed,
+      numPomodoro: new_numPomodoro,
+    });
+    setNewTask("");
   };
 
   const clearTask = (task: Task) => {
-    const id = task.id;
-    setTasks((prev) => prev.filter((task) => task.id !== id));
+    setTasks((prev) => prev.filter((t) => t.id !== task.id));
     deleteTask(task);
   };
 
@@ -89,20 +89,14 @@ export default function TaskList() {
   };
 
   const setCompleted = (user_task: Task) => {
-    setTasks((prev) => {
-      return prev.map((task) => {
-        if (task.id === user_task.id) {
-          return { ...task, completed: !user_task.completed };
-        }
-        return task;
-      });
-    });
-    saveCompleted({
-      id: user_task.id,
-      text: user_task.text,
-      completed: !user_task.completed,
-      numPomodoro: user_task.numPomodoro,
-    });
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === user_task.id
+          ? { ...task, completed: !user_task.completed }
+          : task
+      )
+    );
+    saveCompleted({ ...user_task, completed: !user_task.completed });
   };
 
   useEffect(() => {
@@ -113,287 +107,299 @@ export default function TaskList() {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      if (session?.user) {
-        await loadData();
-      }
+      if (session?.user) await loadData();
     };
-
     fetchTasks();
   }, [session]);
 
   const saveTask = async (task: Task) => {
-    if (session?.user) {
-      try {
-        const res = await fetch("/api/tasks", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: task.id,
-            userid: session.user.id,
-            text: task.text,
-            completed: task.completed,
-            numPomodoro: task.numPomodoro,
-          }),
-        });
-
-        if (!res.ok) {
-          alert("Error saving task");
-        }
-      } catch (error) {
-        console.error("Error saving task:", error);
-        alert("Error saving task");
-      }
+    if (!session?.user) return;
+    try {
+      const res = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...task, userid: session.user.id }),
+      });
+      if (!res.ok) alert("Error saving task");
+    } catch (error) {
+      console.error("Error saving task:", error);
+      alert("Error saving task");
     }
   };
 
-  const deleteTask = async (user_task: Task) => {
-    if (session?.user) {
-      try {
-        const res = await fetch("/api/tasks", {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: user_task.id,
-            userid: session.user.id,
-          }),
-        });
-
-        if (!res.ok) {
-          alert("Error deleting task");
-        }
-      } catch (error) {
-        console.error("Error deleting task:", error);
-        alert("Error deleting task");
-      }
+  const deleteTask = async (task: Task) => {
+    if (!session?.user) return;
+    try {
+      const res = await fetch("/api/tasks", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: task.id, userid: session.user.id }),
+      });
+      if (!res.ok) alert("Error deleting task");
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      alert("Error deleting task");
     }
   };
 
   const deleteAllTasks = async () => {
-    if (session?.user) {
-      try {
-        const res = await fetch("/api/tasks", {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userid: session.user.id,
-          }),
-        });
-
-        if (!res.ok) {
-          alert("Error deleting all tasks");
-        }
-      } catch (error) {
-        console.error("Error deleting all tasks:", error);
-        alert("Error deleting all tasks");
-      }
+    if (!session?.user) return;
+    try {
+      const res = await fetch("/api/tasks", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userid: session.user.id }),
+      });
+      if (!res.ok) alert("Error deleting all tasks");
+    } catch (error) {
+      console.error("Error deleting all tasks:", error);
+      alert("Error deleting all tasks");
     }
   };
 
   const saveCompleted = async (task: Task) => {
-    if (session?.user) {
-      try {
-        const res = await fetch("/api/tasks", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: task.id,
-            userid: session.user.id,
-            text: task.text,
-            completed: task.completed,
-            numPomodoro: task.numPomodoro,
-          }),
-        });
-
-        if (!res.ok) {
-          alert("Error editing task");
-        }
-      } catch (error) {
-        console.error("Error editing task:", error);
-        alert("Error editing task");
-      }
+    if (!session?.user) return;
+    try {
+      const res = await fetch("/api/tasks", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...task, userid: session.user.id }),
+      });
+      if (!res.ok) alert("Error editing task");
+    } catch (error) {
+      console.error("Error editing task:", error);
+      alert("Error editing task");
     }
   };
 
   const loadData = async () => {
-    if (session?.user) {
-      try {
-        const res = await fetch("/api/tasks", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!res.ok) {
-          alert("Error loading tasks");
-        } else {
-          const data = await res.json();
-          setTasks(data.task_list);
-        }
-      } catch (error) {
-        console.error("Error loading tasks:", error);
-        alert("Error loading tasks");
+    if (!session?.user) return;
+    try {
+      const res = await fetch("/api/tasks", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) alert("Error loading tasks");
+      else {
+        const data = await res.json();
+        setTasks(data.task_list);
       }
+    } catch (error) {
+      console.error("Error loading tasks:", error);
+      alert("Error loading tasks");
     }
   };
 
   return (
-    <div className="flex justify-center text-black">
-      <div className="bg-gray-100 rounded-lg w-1/3 text-center">
-        <div className="text-2xl p-2">add tasks</div>
-        <Divider />
-        <div className="p-2">
-          <div className="flex justify-center items-center gap-5">
-            <span>task:</span>
-            <TextField
-              type="text"
-              variant="filled"
-              value={newTask}
-              autoComplete="off"
-              onChange={(e) => {
-                setNewTask(e.target.value);
-              }}
-              sx={{
-                width: "400px",
-                "& .MuiFilledInput-root": {
-                  backgroundColor: "#E5E5E5",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  "&:after": {
-                    borderBottom: "2px solid #2697A3",
-                  },
-                },
-                "& .MuiInputBase-input": {
-                  color: "#000000",
-                  padding: "14px 14px",
-                },
-              }}
-            />
-            <span>pomodoros:</span>
-            <TextField
-              type="text"
-              variant="filled"
-              value={numPomodoros}
-              autoComplete="off"
-              onKeyDown={(e) => {
-                if (["e", "E", "+", "-"].includes(e.key)) {
-                  e.preventDefault();
-                }
-              }}
-              onChange={(e) => {
-                const val = e.target.value;
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: 600,
+        mx: "auto",
+        backgroundColor: "#1E7D87",
+        boxShadow: 3,
+        borderRadius: "20px",
+        color: "white",
+        fontFamily: "Montserrat, Arial, sans",
+        display: "flex",
+        flexDirection: "column",
+        p: 3,
+        mt: 4,
+      }}
+    >
+      <Typography variant="h6" fontWeight="bold" mb={1}>
+        add tasks
+      </Typography>
+      <Divider sx={{ backgroundColor: "rgba(255,255,255,0.2)", mb: 2 }} />
+      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
+        <TextField
+          label="Task"
+          value={newTask}
+          onChange={(e) => setNewTask(e.target.value)}
+          fullWidth
+          autoComplete="off"
+          sx={{
+            input: { color: "white" },
+            flex: 1,
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": { borderColor: "rgba(255,255,255,0.3)" },
+              "&:hover fieldset": { borderColor: "white" },
+              "&.Mui-focused fieldset": { borderColor: "#1DB954" },
+            },
+            "& label": { color: "white" },
+          }}
+        />
+        <TextField
+          label="Pomodoros"
+          value={numPomodoros}
+          autoComplete="off"
+          onKeyDown={(e) => {
+            if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+          }}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (/^\d*\.?\d*$/.test(val)) setNumPomodoros(val);
+          }}
+          onBlur={() => {
+            if (numPomodoros === "" || isNaN(Number(numPomodoros))) {
+              setNumPomodoros("1");
+            }
+          }}
+          sx={{
+            width: "120px",
+            input: { color: "white" },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": { borderColor: "rgba(255,255,255,0.3)" },
+              "&:hover fieldset": { borderColor: "white" },
+              "&.Mui-focused fieldset": { borderColor: "#1DB954" },
+            },
+            "& label": { color: "white" },
+          }}
+        />
+        <Button
+          variant="outlined"
+          onClick={addTask}
+          sx={{
+            color: "white",
+            borderColor: "white",
+            fontWeight: "bold",
+            borderRadius: "50px",
+            textTransform: "none",
+            "&:hover": {
+              borderColor: "#1DB954",
+              color: "#1DB954",
+            },
+          }}
+        >
+          add
+        </Button>
+      </Box>
+      <Typography align="center" variant="body2" mb={2}>
+        or
+      </Typography>
+      <Button
+        onClick={handleAIOpen}
+        sx={{
+          background: "linear-gradient(to right, #00d4ff, #90f7ec)",
+          color: "black",
+          fontWeight: "bold",
+          borderRadius: "16px",
+          textTransform: "none",
+          px: 4,
+          py: 1.5,
+          boxShadow: "0px 0px 10px rgba(0,212,255,0.4)",
+          "&:hover": {
+            transform: "scale(1.05)",
+            boxShadow: "0px 0px 20px rgba(0,212,255,0.6)",
+          },
+        }}
+      >
+        ✨ generate with AI
+      </Button>
 
-                if (/^\d*\.?\d*$/.test(val)) {
-                  setNumPomodoros(val);
-                }
+      <Typography variant="h6" fontWeight="bold" mt={4} mb={2}>
+        your tasks
+      </Typography>
+      <Divider sx={{ backgroundColor: "rgba(255,255,255,0.2)", mb: 2 }} />
+      <Box sx={{ maxHeight: "50vh", overflowY: "auto" }}>
+        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          {tasks.map((task) => (
+            <li
+              key={task.id}
+              style={{
+                borderRadius: "12px",
+                padding: "12px",
+                marginBottom: "12px",
+                backgroundColor: "rgba(38, 151, 163, 0.12)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                textAlign: "center",
               }}
-              onBlur={() => {
-                if (numPomodoros === "" || isNaN(Number(numPomodoros))) {
-                  setNumPomodoros("1");
-                } else {
-                  setNumPomodoros(numPomodoros);
-                }
-              }}
-              sx={{
-                width: "100px",
-                "& .MuiFilledInput-root": {
-                  backgroundColor: "#E5E5E5",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  "&:after": {
-                    borderBottom: "2px solid #2697A3",
-                  },
-                },
-                "& .MuiInputBase-input": {
-                  color: "#000000",
-                  padding: "14px 14px",
-                },
-              }}
-            />
-            <button
-              onClick={addTask}
-              className="p-2 border-2 border-black rounded-2xl transition duration-200 hover:shadow-lg hover:scale-105"
             >
-              add
-            </button>
-          </div>
-          <div className="p-2">or</div>
-          <button
-            onClick={handleAIOpen}
-            className="relative gleam-button bg-gradient-to-r from-[#00d4ff] to-[#90f7ec] text-black border-2 border-black rounded-2xl px-5 py-2 font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_25px_rgba(0,212,255,0.8)] overflow-hidden"
-          >
-            ✨generate with ai
-          </button>
-
-          <div className="text-2xl p-2">your tasks:</div>
-          <Divider />
-          <ul className="max-h-[50vh] overflow-y-auto">
-            {tasks.map((task) => (
-              <li key={task.id} className="break-words whitespace-normal">
-                <span className="block">{task.text}</span>
-                <span className="block">pomodoros: {task.numPomodoro}</span>
-                <div className="flex gap-10 justify-center mb-2 mt-2">
-                  <button
-                    onClick={() => setCompleted(task)}
-                    className="border-2"
-                    style={{
-                      borderRadius: "1rem",
-                      backgroundColor: "transparent",
-                      borderStyle: "solid",
-                      paddingLeft: "0.5rem",
-                      paddingRight: "0.5rem",
-                      borderColor: task.completed ? "#00FF37" : "grey",
-                      color: task.completed ? "#00FF37" : "grey",
-                      transition: "border-color 0.4s ease, color 0.4s ease",
-                      fontFamily: "Montserrat, Arial, sans",
-                      fontWeight: "200",
-                    }}
-                  >
-                    <CheckIcon />
-                  </button>
-                  <button
-                    onClick={() => handleEditOpen(task.id)}
-                    className="border-2 border-black rounded-2xl pl-2 pr-2 transition duration-200 hover:shadow-lg hover:scale-105"
-                  >
-                    edit
-                  </button>
-                  <button
-                    onClick={() => clearTask(task)}
-                    className="border-2 border-black rounded-2xl pl-2 pr-2 transition duration-200 hover:shadow-lg hover:scale-105"
-                  >
-                    <ClearIcon />
-                  </button>
-                </div>
-                <Divider />
-              </li>
-            ))}
-          </ul>
-          <div className="flex justify-end">
-            <button
-              onClick={clearAllTasks}
-              className="p-2 border-2 border-black rounded-2xl mt-2 transition duration-200 hover:shadow-lg hover:scale-105"
-            >
-              clear list
-            </button>
-          </div>
-          <Edit
-            open={open}
-            onClose={handleEditClose}
-            taskID={editTaskID}
-            setTasks={setTasks}
-            tasks={tasks}
-          />
-          <Generate open={openAI} onClose={handleAIClose} setTasks={setTasks} />
-        </div>
-      </div>
-    </div>
+              <div style={{ fontWeight: 500 }}>{task.text}</div>
+              <div style={{ fontSize: "0.9rem", marginTop: 4 }}>
+                pomodoros: {task.numPomodoro}
+              </div>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 2,
+                  mt: 1,
+                }}
+              >
+                <IconButton
+                  onClick={() => setCompleted(task)}
+                  sx={{
+                    borderRadius: "1rem",
+                    border: "2px solid",
+                    borderColor: task.completed ? "#00FF37" : "white",
+                    color: task.completed ? "#00FF37" : "white",
+                    transition: "0.3s ease",
+                  }}
+                >
+                  <CheckIcon />
+                </IconButton>
+                <Button
+                  onClick={() => handleEditOpen(task.id)}
+                  variant="outlined"
+                  sx={{
+                    color: "white",
+                    borderColor: "white",
+                    borderRadius: "16px",
+                    textTransform: "none",
+                    "&:hover": {
+                      color: "#1DB954",
+                      borderColor: "#1DB954",
+                    },
+                  }}
+                >
+                  edit
+                </Button>
+                <IconButton
+                  onClick={() => clearTask(task)}
+                  sx={{
+                    borderRadius: "16px",
+                    color: "white",
+                    border: "2px solid white",
+                    "&:hover": {
+                      color: "#FF5555",
+                      borderColor: "#FF5555",
+                    },
+                  }}
+                >
+                  <ClearIcon />
+                </IconButton>
+              </Box>
+            </li>
+          ))}
+        </ul>
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+        <Button
+          variant="outlined"
+          onClick={clearAllTasks}
+          sx={{
+            color: "white",
+            borderColor: "white",
+            borderRadius: "50px",
+            textTransform: "none",
+            "&:hover": {
+              borderColor: "#FF5555",
+              color: "#FF5555",
+            },
+          }}
+        >
+          clear list
+        </Button>
+      </Box>
+      <Edit
+        open={open}
+        onClose={handleEditClose}
+        taskID={editTaskID}
+        setTasks={setTasks}
+        tasks={tasks}
+      />
+      <Generate open={openAI} onClose={handleAIClose} setTasks={setTasks} />
+    </Box>
   );
 }

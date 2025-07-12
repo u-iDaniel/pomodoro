@@ -32,6 +32,6 @@ model task {
   text         String
   completed    Boolean
   numPomodoros Int
-
-  users users @relation(fields: [userid], references: [userid], onDelete: Cascade, onUpdate: NoAction)
+  order_task   Int?    @default(0)
+  users        users   @relation(fields: [userid], references: [userid], onDelete: Cascade, onUpdate: NoAction)
 }

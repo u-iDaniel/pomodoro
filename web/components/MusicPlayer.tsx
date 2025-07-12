@@ -1,4 +1,13 @@
-import { Box, Typography, Button, TextField } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  Collapse,
+  Fade,
+  Divider,
+  IconButton,
+} from "@mui/material";
 import HeadphonesIcon from "@mui/icons-material/Headphones";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -8,7 +17,7 @@ interface Playlist {
   id: string;
   name: string;
   description: string;
-  images: { url: string }[];
+  images?: { url: string }[];
 }
 
 export default function MusicPlayer() {
@@ -30,13 +39,12 @@ export default function MusicPlayer() {
     try {
       if (input.startsWith("https://open.spotify.com/playlist/")) {
         const url = new URL(input);
-        const pathParts = url.pathname.split('/');
+        const pathParts = url.pathname.split("/");
         return pathParts[pathParts.length - 1];
       }
       // Assuming it's a raw ID if not a URL
       return input;
-    } catch (error) {
-      console.error("Invalid URL or ID:", error);
+    } catch {
       return null;
     }
   };
@@ -70,8 +78,7 @@ export default function MusicPlayer() {
             JSON.stringify(newRecentPlaylists)
           );
         }
-      } catch (error) {
-        console.error("Error fetching playlist:", error);
+      } catch {
         alert("Invalid Spotify Playlist URL or ID");
       }
     } else {
@@ -91,150 +98,223 @@ export default function MusicPlayer() {
   return (
     <Box
       sx={{
-        width: 450,
-        height: isCollapsed ? "auto" : submittedPlaylistId ? 700 : "auto",
-        maxHeight: 700,
-        background: "var(--tertiary)",
+        position: "absolute", // or "fixed", depending on your layout
+        bottom: "1.25rem", // bottom-5
+        left: "1.25rem", // left-5
+        width: isCollapsed ? 280 : 600, // stays anchored while resizing
+        backgroundColor: "rgba(0, 0, 0, 0.15)",
         borderRadius: "20px",
-        p: 2,
-        display: "flex",
-        flexDirection: "column",
+        p: 3,
         color: "white",
-        transition: "height 0.3s ease-in-out, max-height 0.3s ease-in-out",
-        overflow: "hidden",
+        fontFamily: "Montserrat, Arial, sans",
+        boxShadow: 3,
+        transition: "width 0.3s ease",
+        transformOrigin: "bottom left", // 👈 important to keep anchor fixed
       }}
     >
+      {/* Header with divider */}
       <Box
+        onClick={() => setIsCollapsed(!isCollapsed)}
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          px: 1,
-          mb: isCollapsed ? 0 : 2,
           cursor: "pointer",
         }}
-        onClick={() => setIsCollapsed(!isCollapsed)}
       >
-        <Typography variant="h6" component="h1" sx={{ fontWeight: "bold" }}>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: "bold", marginBottom: "1rem" }}
+        >
           music player <HeadphonesIcon sx={{ verticalAlign: "middle" }} />
         </Typography>
-        {isCollapsed ? (
-          <KeyboardArrowDownIcon sx={{ fontSize: 40 }} />
-        ) : (
-          <KeyboardArrowUpIcon sx={{ fontSize: 40 }} />
-        )}
+        <IconButton sx={{ color: "white", marginBottom: "1rem" }}>
+          {isCollapsed ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        </IconButton>
       </Box>
 
-      {!isCollapsed && (
-        <Box sx={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {submittedPlaylistId ? (
-            <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Button
-                  onClick={handleBack}
-                  sx={{ color: 'white', minWidth: 'auto', p: 1, mr: 1 }}
-                  aria-label="Back to playlist input"
-                >
-                  ←
-                </Button>
-                <Typography variant="h6" sx={{color: 'white' }}>
-                  connected playlist
-                </Typography>
-              </Box>
-              <Box sx={{ flexGrow: 1, borderRadius: '12px', overflow: 'hidden', height: '600px' }}>
-                <iframe
-                  src={`https://open.spotify.com/embed/playlist/${submittedPlaylistId}?theme=0`}
-                  width="100%"
-                  height="100%"
-                  allowFullScreen
-                  allow="autoplay; encrypted-media; clipboard-write"
-                  loading="lazy"
-                  style={{ borderRadius: '12px' }}
-                />
-              </Box>
-            </Box>
-          ) : (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '90%', alignItems: 'center', pb: 2 }}>
-              {recentPlaylists.length > 0 && (
-                <Box sx={{ width: "100%", mb: 2 }}>
-                  <Typography variant="h6" sx={{ mb: 1 }}>
-                    recent playlists:
-                  </Typography>
-                  {recentPlaylists.map((playlist) => (
-                    <Box
-                      key={playlist.id}
-                      onClick={() => handleRecentPlaylistClick(playlist.id)}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 2,
-                        p: 1,
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        "&:hover": {
-                          backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        },
-                      }}
-                    >
-                      <img
-                        src={playlist.images[0]?.url}
-                        alt={playlist.name}
-                        width={50}
-                        height={50}
-                        style={{ borderRadius: "4px" }}
-                      />
-                      <Box>
-                        <Typography sx={{ fontWeight: "bold" }}>
-                          {playlist.name}
-                        </Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.7 }}>
-                          {playlist.description}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-              <Typography sx={{ textAlign: 'center' }}>enter a public Spotify playlist id or url (on the spotify app, go to share -{'>'} copy link to playlist) </Typography>
-              <TextField
-                label="playlist ID or URL"
-                variant="outlined"
-                value={playlistIdInput}
-                onChange={(e) => setPlaylistIdInput(e.target.value)}
-                fullWidth
-                slotProps={{
-                  inputLabel: { 
-                    style: { 
-                      color: 'rgba(255, 255, 255, 0.7)'
-                    } 
-                  },
-                }}
+      <Divider sx={{ backgroundColor: "white", mb: 2 }} />
+
+      <Collapse in={!isCollapsed} timeout={400} unmountOnExit>
+        <Fade in={!isCollapsed} timeout={400}>
+          <Box>
+            {submittedPlaylistId ? (
+              <Box
                 sx={{
-                  input: { color: 'white' },
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.5)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'white',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#1DB954',
-                    },
-                  },
+                  width: "100%",
+                  height: "50vh",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
-              />
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                sx={{ backgroundColor: "#1DB954", color: "white", fontWeight: "bold", borderRadius: "50px", px: 4, py: 1, '&:hover': { backgroundColor: "#1ed760" } }}
               >
-                connect playlist
-              </Button>
-            </Box>
-          )}
-        </Box>
-      )}
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Button
+                    onClick={handleBack}
+                    sx={{
+                      color: "white",
+                      minWidth: "auto",
+                      p: 1,
+                      mr: 1,
+                      fontWeight: "bold",
+                      borderRadius: "16px",
+                      border: "2px solid white",
+                      textTransform: "none",
+                      transition:
+                        "transform 0.2s ease, color 0.2s ease, border-color 0.2s ease",
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                        backgroundColor: "transparent",
+                      },
+                    }}
+                    aria-label="Back to playlist input"
+                  >
+                    ←
+                  </Button>
+                  <Typography variant="h6" sx={{ color: "white" }}>
+                    connected playlist
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <iframe
+                    src={`https://open.spotify.com/embed/playlist/${submittedPlaylistId}?theme=0`}
+                    width="100%"
+                    height="100%"
+                    allowFullScreen
+                    allow="autoplay; encrypted-media; clipboard-write"
+                    loading="lazy"
+                    style={{ borderRadius: "12px", border: "none" }}
+                    title="Spotify Playlist"
+                  />
+                </Box>
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  alignItems: "center",
+                }}
+              >
+                {recentPlaylists.length > 0 && (
+                  <Box sx={{ width: "100%", mb: 2 }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ mb: 1, fontWeight: "bold" }}
+                    >
+                      recent playlists:
+                    </Typography>
+                    {recentPlaylists.map((playlist) => (
+                      <Box
+                        key={playlist.id}
+                        onClick={() => handleRecentPlaylistClick(playlist.id)}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 2,
+                          padding: "8px",
+                          borderRadius: "12px",
+                          cursor: "pointer",
+                          border: "1px solid rgba(255, 255, 255, 0.2)",
+                          "&:hover": {
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                          },
+                          userSelect: "none",
+                        }}
+                      >
+                        {Array.isArray(playlist.images) &&
+                        playlist.images.length > 0 &&
+                        playlist.images[0].url ? (
+                          <img
+                            src={playlist.images[0].url}
+                            alt={playlist.name}
+                            width={50}
+                            height={50}
+                            style={{ borderRadius: "8px" }}
+                          />
+                        ) : null}
+                        <Box>
+                          <Typography sx={{ fontWeight: "bold" }}>
+                            {playlist.name}
+                          </Typography>
+                          <Typography variant="body2" sx={{ opacity: 0.7 }}>
+                            {playlist.description}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+
+                <Typography variant="body2" sx={{ color: "white" }}>
+                  enter a public Spotify playlist id or url (on the spotify app,
+                  go to share -&gt; copy link to playlist)
+                </Typography>
+
+                <TextField
+                  label="playlist ID or URL"
+                  variant="outlined"
+                  value={playlistIdInput}
+                  onChange={(e) => setPlaylistIdInput(e.target.value)}
+                  fullWidth
+                  autoComplete="off"
+                  size="small"
+                  InputLabelProps={{
+                    style: { color: "rgba(255, 255, 255, 0.6)" },
+                  }}
+                  sx={{
+                    input: { color: "white" },
+                    "& .MuiOutlinedInput-root": {
+                      fontFamily: "Montserrat, Arial, sans-serif",
+                      borderRadius: "16px",
+                      "& fieldset": {
+                        borderColor: "rgba(255, 255, 255, 0.3)",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "white",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "white",
+                      },
+                    },
+                  }}
+                />
+
+                <div className="flex w-full justify-end">
+                  <Button
+                    variant="outlined"
+                    onClick={handleSubmit}
+                    sx={{
+                      color: "white",
+                      borderColor: "white",
+                      border: "2px solid white",
+                      fontWeight: "bold",
+                      borderRadius: "16px",
+                      px: 2,
+                      py: 1,
+                      textTransform: "none",
+                      transition: "transform 0.2s ease",
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                        backgroundColor: "transparent",
+                      },
+                    }}
+                  >
+                    connect playlist
+                  </Button>
+                </div>
+              </Box>
+            )}
+          </Box>
+        </Fade>
+      </Collapse>
     </Box>
   );
 }
