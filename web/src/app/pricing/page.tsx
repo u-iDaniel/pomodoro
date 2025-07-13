@@ -11,17 +11,29 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { useSearchParams } from "next/navigation";
 
 export default function PricingPage() {
-    const handlePremiumClick = () => {
-        // Here you would integrate with a payment provider like Stripe
-        alert("Redirecting to payment provider...");
-    };
+  const searchParams = useSearchParams();
+  const canceled = searchParams.get("canceled");
+
+  if (canceled) {
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", p: 4, backgroundColor: 'var(--primary)', textAlign: 'center', justifyContent: 'center', alignItems: 'center' }}>
+        <Typography variant="h2" component="h1" textAlign="center" sx={{ mb: 4, color: 'white', fontWeight: 'bold' }}>
+          payment canceled
+        </Typography>
+        <Typography variant="body1" textAlign="center" sx={{ mb: 2, color: 'white' }}>
+          your payment has been canceled. you can try again if you wish.
+        </Typography>
+      </Box>
+    );
+  }
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", p: 4, backgroundColor: 'var(--primary)', textAlign: 'center', justifyContent: 'center', alignItems: 'center' }}>
             <Typography variant="h2" component="h1" textAlign="center" sx={{ mb: 4, color: 'white', fontWeight: 'bold' }}>
-                Pricing
+                pricing
             </Typography>
             <Grid container spacing={4} justifyContent="center" alignItems="stretch" >
                 {/* Free Tier */}
@@ -29,35 +41,32 @@ export default function PricingPage() {
                     <Card sx={{ borderRadius: '64px', p: "16px", height: '100%', display: 'flex', flexDirection: 'column' }}>
                         <CardContent sx={{ flexGrow: 1 }}>
                             <Typography variant="h4" component="h2" textAlign="center" sx={{ mb: 2, fontWeight: 'bold' }}>
-                                Free
-                            </Typography>
-                            <Typography variant="h5" textAlign="center" sx={{ mb: 4 }}>
-                                $0/lifetime
+                                free
                             </Typography>
                             <List>
                                 <ListItem>
                                     <ListItemIcon>
                                         <CheckCircleIcon sx={{ color: 'green' }} />
                                     </ListItemIcon>
-                                    <ListItemText primary="Full pomodoro timer functionality ⌛" />
+                                    <ListItemText primary="full pomodoro timer functionality ⌛" />
                                 </ListItem>
                                 <ListItem>
                                     <ListItemIcon>
                                         <CheckCircleIcon sx={{ color: 'green' }} />
                                     </ListItemIcon>
-                                    <ListItemText primary="Task list (3 free AI generations) 🤖" />
+                                    <ListItemText primary="task list (3 free AI generations) 🤖" />
                                 </ListItem>
                                 <ListItem>
                                     <ListItemIcon>
                                         <CheckCircleIcon sx={{ color: 'green' }} />
                                     </ListItemIcon>
-                                    <ListItemText primary="Block list (up to 3 websites) 🚫" />
+                                    <ListItemText primary="block list (up to 3 websites) 🚫" />
                                 </ListItem>
                                 <ListItem>
                                     <ListItemIcon>
                                         <CheckCircleIcon sx={{ color: 'green' }} />
                                     </ListItemIcon>
-                                    <ListItemText primary="Full customizability in settings ⚙️" />
+                                    <ListItemText primary="full customizability in settings ⚙️" />
                                 </ListItem>
                             </List>
                         </CardContent>
@@ -69,42 +78,50 @@ export default function PricingPage() {
                     <Card sx={{ borderRadius: '64px', border: '2px solid #1DB954', height: '100%', display: 'flex', flexDirection: 'column' }}>
                         <CardContent sx={{ flexGrow: 1 }}>
                             <Typography variant="h4" component="h2" textAlign="center" sx={{ mb: 2, fontWeight: 'bold', color: '#1DB954' }}>
-                                Premium
+                                premium
                             </Typography>
                             <Typography variant="h5" textAlign="center" sx={{ mb: 4 }}>
-                                $10/lifetime
+                                $10 for lifetime access
                             </Typography>
                             <List>
                                 <ListItem>
                                     <ListItemIcon>
                                         <CheckCircleIcon sx={{ color: 'green' }} />
                                     </ListItemIcon>
-                                    <ListItemText primary="Everything in Free ✨" />
+                                    <ListItemText primary="everything in free ✨" />
                                 </ListItem>
                                 <ListItem>
                                     <ListItemIcon>
                                         <CheckCircleIcon sx={{ color: 'green' }} />
                                     </ListItemIcon>
-                                    <ListItemText primary="Spotify Music Player (10x fewer ads if you don't have Spotify Premium) 🎶" />
+                                    <ListItemText primary="spotify music player (10x fewer ads if you don't have spotify premium) 🎶" />
                                 </ListItem>
                                 <ListItem>
                                     <ListItemIcon>
                                         <CheckCircleIcon sx={{ color: 'green' }} />
                                     </ListItemIcon>
-                                    <ListItemText primary="Unlimited site blocking 🚫" />
+                                    <ListItemText primary="unlimited site blocking 🚫" />
                                 </ListItem>
                                 <ListItem>
                                     <ListItemIcon>
                                         <CheckCircleIcon sx={{ color: 'green' }} />
                                     </ListItemIcon>
-                                    <ListItemText primary="Unlimited AI task list generation 🤖" />
+                                    <ListItemText primary="unlimited AI task list generation 🤖" />
+                                </ListItem>
+                                <ListItem>
+                                    <ListItemIcon>
+                                        <CheckCircleIcon sx={{ color: 'green' }} />
+                                    </ListItemIcon>
+                                    <ListItemText primary="plus full access to future releases! (e.g. gamification, streaks, and more!) 📈" />
                                 </ListItem>
                             </List>
                         </CardContent>
                         <Box sx={{ p: 2, textAlign: 'center' }}>
-                            <Button variant="contained" size="large" sx={{ borderRadius: '20px', backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1ed760' } }} onClick={handlePremiumClick}>
-                                Go Premium
+                          <form action="/api/checkout_sessions" method="post">
+                            <Button type="submit" variant="contained" size="large" sx={{ borderRadius: '20px', backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1ed760' } }}>
+                              go premium
                             </Button>
+                          </form>
                         </Box>
                     </Card>
                 </Grid>
