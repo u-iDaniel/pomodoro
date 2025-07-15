@@ -26,13 +26,18 @@ export default function UserLogin() {
     setAnchorEl(null);
   };
 
-  const handleEditPreferences = () => {
-    router.push("/form");
-    handleClose();
-  };
+  // const handleEditPreferences = () => {
+  //   router.push("/form");
+  //   handleClose();
+  // };
 
   const handleSignOut = () => {
     signOut();
+    handleClose();
+  };
+
+  const handlePricing = () => {
+    router.push("/pricing");
     handleClose();
   };
 
@@ -48,7 +53,8 @@ export default function UserLogin() {
         />
       </div>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={handleEditPreferences}>edit preferences</MenuItem>
+        {/* <MenuItem onClick={handleEditPreferences}>edit preferences</MenuItem> */}
+        <MenuItem onClick={handlePricing}>pricing</MenuItem>
         <MenuItem onClick={handleSignOut}>sign out</MenuItem>
       </Menu>
     </>
