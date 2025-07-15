@@ -27,6 +27,7 @@ export default function RootLayoutClient({ children }: RootLayoutClientProps) {
         <CssBaseline />
         <TimerProvider>
           <Navbar title="pomoAI" titleHref="/" />
+          {/* next time we can wrap children around a div that has height = calc(100vh - navbarHeight) */}
           {children}
         </TimerProvider>
       </SessionProvider>

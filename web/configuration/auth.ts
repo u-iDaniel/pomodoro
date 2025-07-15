@@ -36,6 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
         }
         
+        user.isMember = dbUser?.ismember;
         user.id = dbUser?.userid;
 
         return true;
@@ -44,8 +45,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (user) {
           token.id = user.id;
           token.isNewUser = user.isNewUser;
+          token.isMember = user.isMember;
           token.image = user.image;
         }
+
+        const dbUser = await prisma.users.findUnique({
+          where: { userid: token.id as string },
+        });
+        token.isMember = dbUser?.ismember;
         return token;
       },
       async session({ session, token }) {
@@ -55,6 +62,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           session.user.name = token.name as string;
           session.user.image = token.image as string;
           session.user.isNewUser = token.isNewUser as boolean;
+          session.user.isMember = token.isMember as boolean;
         }
         // console.log("Session:", session);
         return session;

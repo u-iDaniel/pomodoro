@@ -12,6 +12,8 @@ import HeadphonesIcon from "@mui/icons-material/Headphones";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface Playlist {
   id: string;
@@ -21,6 +23,8 @@ interface Playlist {
 }
 
 export default function MusicPlayer() {
+  const { data: session } = useSession();
+  const router = useRouter();
   const [playlistIdInput, setPlaylistIdInput] = useState<string>("");
   const [submittedPlaylistId, setSubmittedPlaylistId] = useState<string | null>(
     null
@@ -98,18 +102,18 @@ export default function MusicPlayer() {
   return (
     <Box
       sx={{
-        position: "absolute", // or "fixed", depending on your layout
-        bottom: "1.25rem", // bottom-5
-        left: "1.25rem", // left-5
-        width: isCollapsed ? 280 : 600, // stays anchored while resizing
+        position: "absolute",
+        bottom: "1.25rem",
+        left: "1.25rem",
+        width: isCollapsed ? 280 : 600,
         backgroundColor: "rgba(0, 0, 0, 0.15)",
         borderRadius: "20px",
         p: 3,
         color: "white",
-        fontFamily: "Montserrat, Arial, sans",
+        fontFamily: "Montserrat, Arial, sans-serif",
         boxShadow: 3,
         transition: "width 0.3s ease",
-        transformOrigin: "bottom left", // 👈 important to keep anchor fixed
+        transformOrigin: "bottom left",
       }}
     >
       {/* Header with divider */}
@@ -133,16 +137,22 @@ export default function MusicPlayer() {
         </IconButton>
       </Box>
 
-      <Divider sx={{ backgroundColor: "white", mb: 2 }} />
-
-      <Collapse in={!isCollapsed} timeout={400} unmountOnExit>
-        <Fade in={!isCollapsed} timeout={400}>
-          <Box>
+      {!isCollapsed &&
+        (session?.user.isMember ? (
+          <Box
+            sx={{
+              flexGrow: 1,
+              overflowY: "auto",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
             {submittedPlaylistId ? (
               <Box
                 sx={{
                   width: "100%",
-                  height: "50vh",
+                  height: "100%",
                   display: "flex",
                   flexDirection: "column",
                 }}
@@ -150,22 +160,7 @@ export default function MusicPlayer() {
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Button
                     onClick={handleBack}
-                    sx={{
-                      color: "white",
-                      minWidth: "auto",
-                      p: 1,
-                      mr: 1,
-                      fontWeight: "bold",
-                      borderRadius: "16px",
-                      border: "2px solid white",
-                      textTransform: "none",
-                      transition:
-                        "transform 0.2s ease, color 0.2s ease, border-color 0.2s ease",
-                      "&:hover": {
-                        transform: "scale(1.05)",
-                        backgroundColor: "transparent",
-                      },
-                    }}
+                    sx={{ color: "white", minWidth: "auto", p: 1, mr: 1 }}
                     aria-label="Back to playlist input"
                   >
                     ←
@@ -179,6 +174,7 @@ export default function MusicPlayer() {
                     flexGrow: 1,
                     borderRadius: "12px",
                     overflow: "hidden",
+                    height: "600px",
                   }}
                 >
                   <iframe
@@ -188,7 +184,7 @@ export default function MusicPlayer() {
                     allowFullScreen
                     allow="autoplay; encrypted-media; clipboard-write"
                     loading="lazy"
-                    style={{ borderRadius: "12px", border: "none" }}
+                    style={{ borderRadius: "12px" }}
                     title="Spotify Playlist"
                   />
                 </Box>
@@ -196,19 +192,17 @@ export default function MusicPlayer() {
             ) : (
               <Box
                 sx={{
-                  width: "100%",
                   display: "flex",
                   flexDirection: "column",
                   gap: 2,
+                  width: "90%",
                   alignItems: "center",
+                  pb: 2,
                 }}
               >
                 {recentPlaylists.length > 0 && (
                   <Box sx={{ width: "100%", mb: 2 }}>
-                    <Typography
-                      variant="subtitle1"
-                      sx={{ mb: 1, fontWeight: "bold" }}
-                    >
+                    <Typography variant="h6" sx={{ mb: 1 }}>
                       recent playlists:
                     </Typography>
                     {recentPlaylists.map((playlist) => (
@@ -219,27 +213,21 @@ export default function MusicPlayer() {
                           display: "flex",
                           alignItems: "center",
                           gap: 2,
-                          padding: "8px",
-                          borderRadius: "12px",
+                          p: 1,
+                          borderRadius: "8px",
                           cursor: "pointer",
-                          border: "1px solid rgba(255, 255, 255, 0.2)",
                           "&:hover": {
                             backgroundColor: "rgba(255, 255, 255, 0.1)",
                           },
-                          userSelect: "none",
                         }}
                       >
-                        {Array.isArray(playlist.images) &&
-                        playlist.images.length > 0 &&
-                        playlist.images[0].url ? (
-                          <img
-                            src={playlist.images[0].url}
-                            alt={playlist.name}
-                            width={50}
-                            height={50}
-                            style={{ borderRadius: "8px" }}
-                          />
-                        ) : null}
+                        <img
+                          src={playlist.images[0]?.url}
+                          alt={playlist.name}
+                          width={50}
+                          height={50}
+                          style={{ borderRadius: "4px" }}
+                        />
                         <Box>
                           <Typography sx={{ fontWeight: "bold" }}>
                             {playlist.name}
@@ -252,69 +240,64 @@ export default function MusicPlayer() {
                     ))}
                   </Box>
                 )}
-
-                <Typography variant="body2" sx={{ color: "white" }}>
+                <Typography sx={{ textAlign: "center" }}>
                   enter a public Spotify playlist id or url (on the spotify app,
-                  go to share -&gt; copy link to playlist)
+                  go to share -{">"} copy link to playlist)
                 </Typography>
-
                 <TextField
                   label="playlist ID or URL"
                   variant="outlined"
                   value={playlistIdInput}
                   onChange={(e) => setPlaylistIdInput(e.target.value)}
                   fullWidth
-                  autoComplete="off"
-                  size="small"
                   InputLabelProps={{
-                    style: { color: "rgba(255, 255, 255, 0.6)" },
-                  }}
-                  sx={{
-                    input: { color: "white" },
-                    "& .MuiOutlinedInput-root": {
-                      fontFamily: "Montserrat, Arial, sans-serif",
-                      borderRadius: "16px",
-                      "& fieldset": {
-                        borderColor: "rgba(255, 255, 255, 0.3)",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "white",
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "white",
-                      },
+                    style: {
+                      color: "rgba(255, 255, 255, 0.7)",
                     },
                   }}
+                  sx={{
+                    width: "100%",
+                  }}
                 />
-
-                <div className="flex w-full justify-end">
-                  <Button
-                    variant="outlined"
-                    onClick={handleSubmit}
-                    sx={{
-                      color: "white",
-                      borderColor: "white",
-                      border: "2px solid white",
-                      fontWeight: "bold",
-                      borderRadius: "16px",
-                      px: 2,
-                      py: 1,
-                      textTransform: "none",
-                      transition: "transform 0.2s ease",
-                      "&:hover": {
-                        transform: "scale(1.05)",
-                        backgroundColor: "transparent",
-                      },
-                    }}
-                  >
-                    connect playlist
-                  </Button>
-                </div>
+                <Button
+                  variant="outlined"
+                  onClick={handleSubmit}
+                  sx={{
+                    color: "white",
+                    borderColor: "white",
+                    border: "2px solid white",
+                    fontWeight: "bold",
+                    borderRadius: "16px",
+                    px: 2,
+                    py: 1,
+                    textTransform: "none",
+                    transition: "transform 0.2s ease",
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                      backgroundColor: "transparent",
+                    },
+                    mt: 2,
+                  }}
+                >
+                  connect playlist
+                </Button>
               </Box>
             )}
           </Box>
-        </Fade>
-      </Collapse>
+        ) : (
+          <Box sx={{ textAlign: "center", color: "white", mt: 2 }}>
+            <Typography variant="body1">
+              premium members get unlimited access to the music player!
+            </Typography>
+            <Button
+              variant="outlined"
+              sx={{ mt: 2, color: "white", borderColor: "white" }}
+              onClick={() => router.push("/pricing")}
+            >
+              get premium
+            </Button>
+          </Box>
+        ))}
     </Box>
   );
 }
