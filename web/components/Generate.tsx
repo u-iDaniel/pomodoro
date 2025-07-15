@@ -30,6 +30,7 @@ interface DialogComponentProps {
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
 
+// Maximum file size limit set to 10MB to prevent performance issues and ensure efficient processing.
 const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
 const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
@@ -65,7 +66,8 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
   const handlePdfChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.size > MAX_SIZE_BYTES) {
-      alert("Please upload a file under 10 MB");
+      const maxSizeMB = (MAX_SIZE_BYTES / (1024 * 1024)).toFixed(1) + " MB";
+      alert(`Please upload a file under ${maxSizeMB}`);
       e.target.value = "";
     }
     if (file && file.type === "application/pdf") {
