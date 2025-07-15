@@ -11,26 +11,20 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 export default function PricingPage() {
+  const router = useRouter();
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  if (!session?.user) {
-    return (
-        <Box sx={{ display: "flex", flexDirection: "column", p: 4, backgroundColor: 'var(--primary)', textAlign: 'center', justifyContent: 'center', alignItems: 'center' }}>
-            <Typography variant="h2" component="h1" textAlign="center" sx={{ mb: 4, color: 'white', fontWeight: 'bold' }}>
-            please log in to view pricing
-            </Typography>
-            <Button variant="contained" color="primary" href="/login">
-            Log In
-            </Button>
-        </Box>
-    );
-  }
 
   const canceled = searchParams.get("canceled");
+
+  const handleNotLoggedIn = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    router.push("/login");
+  }
 
   if (canceled) {
     return (
@@ -133,9 +127,15 @@ export default function PricingPage() {
                         </CardContent>
                         <Box sx={{ p: 2, textAlign: 'center' }}>
                           <form action="/api/checkout_sessions" method="post">
+                          {session?.user ? (
                             <Button disabled={session?.user?.isMember ?? undefined} type="submit" variant="contained" size="large" sx={{ borderRadius: '20px', backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1ed760' } }}>
-                              go premium
+                                go premium
                             </Button>
+                          ) : (
+                            <Button onClick={handleNotLoggedIn} variant="contained" size="large" sx={{ borderRadius: '20px', backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1ed760' } }}>
+                                go premium
+                            </Button>
+                          )}
                           </form>
                         </Box>
                     </Card>

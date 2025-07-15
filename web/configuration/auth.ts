@@ -52,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const dbUser = await prisma.users.findUnique({
           where: { userid: token.id as string },
         });
-        token.isMember = dbUser?.ismember ?? false;
+        token.isMember = dbUser?.ismember;
         return token;
       },
       async session({ session, token }) {

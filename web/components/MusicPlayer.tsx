@@ -255,8 +255,6 @@ export default function MusicPlayer() {
           </Box>
         )
       )}
-        {/*  */}
-      {/* )} */}
     </Box>
   );
 }

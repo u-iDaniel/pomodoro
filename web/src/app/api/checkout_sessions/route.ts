@@ -25,7 +25,7 @@ export async function POST() {
             },
             line_items: [
                 {
-                    price: "price_1RjENBPDhVFLHKvCkV9qTUjO",
+                    price: process.env.STRIPE_PREMIUM_MEMBERSHIP_PRICE_ID!,
                     quantity: 1,
                 },
             ],

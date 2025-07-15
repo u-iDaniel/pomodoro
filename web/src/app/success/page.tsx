@@ -3,8 +3,8 @@ import { stripe } from "@/lib/stripe";
 import Link from "next/link";
 import SessionUpdater from "@/components/SessionUpdater";
 
-export default async function SuccessPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
-  const { session_id } = await searchParams;
+export default async function SuccessPage({ searchParams }: { searchParams: { [key: string]: string | undefined } }) {
+  const { session_id } = searchParams;
 
   if (!session_id)
     throw new Error('Please provide a valid session_id (`cs_test_...`)')
@@ -16,7 +16,7 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
   const status = session.status;
   const customerEmail = session.customer_details?.email;
 
-  if (status === 'open') {
+  if (status === 'open' || status === 'expired') {
     return redirect('/')
   }
 

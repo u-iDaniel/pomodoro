@@ -3,14 +3,14 @@ declare module '@auth/core/types' {
 	interface User {
 		id: string
 		isNewUser?: boolean
-		isMember?: boolean | null
+		isMember: boolean
 	}
 
 	interface Session {
 		user: {
             id: string
             isNewUser?: boolean
-			isMember?: boolean | null
+			isMember: boolean
 		} & DefaultSession['user']
 	}
 }
