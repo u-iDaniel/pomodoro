@@ -30,6 +30,7 @@ interface DialogComponentProps {
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
 
+// Maximum file size limit set to 10MB to prevent performance issues and ensure efficient processing.
 const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
 const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
