@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { stripe } from "@/lib/stripe";
 import Link from "next/link";
+import SessionUpdater from "@/components/SessionUpdater";
 
 export default async function SuccessPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
   const { session_id } = await searchParams;
@@ -22,6 +23,7 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
   if (status === 'complete') {
     return (
       <section className="flex flex-col items-center justify-center h-[calc(100vh-200px)]">
+        <SessionUpdater />
         <div className="bg-white rounded-xl shadow-lg p-10 flex flex-col items-center max-w-xl w-full">
           <div className="mb-6">
             <svg className="w-16 h-16 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

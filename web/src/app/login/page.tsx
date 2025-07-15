@@ -12,11 +12,11 @@ export default function Login() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      if (session?.user?.isNewUser) {
-        router.push("/form"); // Redirect new users to /form
-      } else {
+      // if (session?.user?.isNewUser) {
+        // router.push("/form"); // Redirect new users to /form
+      // } else {
         router.push("/"); // Redirect existing users to /
-      }
+      // }
     }
   }, [session, status, router]);
 

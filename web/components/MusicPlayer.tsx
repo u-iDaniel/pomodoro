@@ -3,6 +3,8 @@ import HeadphonesIcon from "@mui/icons-material/Headphones";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface Playlist {
   id: string;
@@ -12,6 +14,8 @@ interface Playlist {
 }
 
 export default function MusicPlayer() {
+  const { data: session } = useSession();
+  const router = useRouter();
   const [playlistIdInput, setPlaylistIdInput] = useState<string>("");
   const [submittedPlaylistId, setSubmittedPlaylistId] = useState<string | null>(
     null
@@ -126,7 +130,8 @@ export default function MusicPlayer() {
       </Box>
 
       {!isCollapsed && (
-        <Box sx={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        session?.user.isMember ? (
+          <Box sx={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {submittedPlaylistId ? (
             <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -234,7 +239,24 @@ export default function MusicPlayer() {
             </Box>
           )}
         </Box>
+        ) : (
+          <Box sx={{ textAlign: 'center', color: 'white', mt:
+            2 }}>
+            <Typography variant="body1">
+              premium members get unlimited access to the music player!
+            </Typography>
+            <Button
+              variant="outlined"
+              sx={{ mt: 2, color: 'white', borderColor: 'white' }}
+              onClick={() => router.push('/pricing')}
+            >
+              get premium
+            </Button>
+          </Box>
+        )
       )}
+        {/*  */}
+      {/* )} */}
     </Box>
   );
 }

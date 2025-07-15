@@ -22,6 +22,7 @@ model users {
   googleemail String       @unique @db.VarChar(255)
   imageicon   String?      @db.VarChar(255)
   name        String       @db.VarChar(255)
+  ismember    Boolean?     @default(false)
   preference  preference[]
   task        task[]
 }
@@ -32,6 +33,6 @@ model task {
   text         String
   completed    Boolean
   numPomodoros Int
-
-  users users @relation(fields: [userid], references: [userid], onDelete: Cascade, onUpdate: NoAction)
+  order_task   Int?    @default(0)
+  users        users   @relation(fields: [userid], references: [userid], onDelete: Cascade, onUpdate: NoAction)
 }
