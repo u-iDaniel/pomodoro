@@ -12,12 +12,18 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { deepPurple } from '@mui/material/colors';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 export default function BlockList() {
+  const { data: session } = useSession();
   const [blockedSites, setBlockedSites] = useState<string[]>(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && session?.user?.isMember) {
       const savedSites = localStorage.getItem('blockedSites');
       return savedSites ? JSON.parse(savedSites) : [];
+    } else if (typeof window !== 'undefined' && !session?.user?.isMember) {
+      const savedSites = localStorage.getItem('blockedSites');
+      return savedSites ? JSON.parse(savedSites).slice(0, 3) : [];
     }
     return [];
   });
@@ -34,6 +40,11 @@ export default function BlockList() {
   }, [blockedSites]);
 
   const handleAddSite = () => {
+    if (!session?.user?.isMember && blockedSites.length >= 3) {
+      alert('become a member to block more than 3 websites!');
+      return;
+    }
+
     if (newSite.trim() !== '' && !blockedSites.includes(newSite.trim())) {
       setBlockedSites([...blockedSites, newSite.trim()]);
       setNewSite('');
@@ -57,8 +68,13 @@ export default function BlockList() {
         block distracting websites
       </Typography>
       <Typography variant="body2" sx={{ p: 2 }}>
-        add websites you find distracting to this list. these websites will be blocked during your pomodoro sessions.
+        add websites you find distracting to this list. these websites will be blocked during your pomodoro sessions. note that you will need to install the chrome extension to do so.
       </Typography>
+      {(!session?.user?.isMember &&
+        <Typography variant="body2" sx={{ p: 2, color: 'red' }}>
+          you can block up to 3 websites as a free user. <Link href={"/pricing"} className='underline'>become a member</Link> to block more!
+        </Typography>
+      )}
       <Divider />
       <Box sx={{ p: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
         <TextField
@@ -108,7 +124,7 @@ export default function BlockList() {
           <>
             <Divider />
             <ListItem>
-              <ListItemText primary="No websites are currently blocked." sx={{ textAlign: 'center', color: 'blue' }} />
+              <ListItemText primary="no websites are currently blocked." sx={{ textAlign: 'center', color: 'blue' }} />
             </ListItem>
           </>
         )}
