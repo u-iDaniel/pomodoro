@@ -14,7 +14,6 @@ import "@fontsource/montserrat/200.css";
 
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 
 import TextField from "@mui/material/TextField";
 import { useTimer } from "./TimerContext";
@@ -85,8 +84,11 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
         sx={{
           textAlign: "center",
           backgroundColor: "white",
-          color: "#000000",
+          color: "black",
           padding: "0px",
+          fontFamily: "Montserrat, Arial, sans-serif",
+          fontWeight: "bold",
+          fontSize: "1.25rem",
         }}
       >
         settings
@@ -106,15 +108,17 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
           }}
         ></Box>
 
-        <p style={{ paddingTop: "0px", fontSize: "1.25rem" }}>
+        <p
+          style={{ paddingTop: "0px", fontSize: "1.25rem", fontWeight: "bold" }}
+        >
           <AccessTimeIcon /> time (minutes)
         </p>
         <List sx={{ display: "flex" }}>
-          <ListItem sx={{ display: "block", padding: "0" }}>
-            <ListItemText primary="pomodoro" />
+          <ListItem sx={{ display: "block" }}>
             <TextField
               type="text"
-              variant="filled"
+              label="pomodoro"
+              variant="outlined"
               value={pomodoro}
               onKeyDown={(e) => {
                 if (["e", "E", "+", "-"].includes(e.key)) {
@@ -136,29 +140,34 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
                   setPomodoro(pomodoro);
                 }
               }}
+              InputLabelProps={{
+                style: { color: "rgba(0, 0, 0, 0.6)" },
+              }}
               sx={{
-                width: "100px",
-                "& .MuiFilledInput-root": {
-                  backgroundColor: "#E5E5E5",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  "&:after": {
-                    borderBottom: "2px solid #2697A3",
+                fontFamily: "Montserrat, Arial, sans",
+                input: { color: "#000000" },
+                "& .MuiOutlinedInput-root": {
+                  fontFamily: "Montserrat, Arial, sans",
+                  "& fieldset": {
+                    borderColor: "rgba(0, 0, 0, 0.4)",
+                    borderRadius: "16px",
                   },
-                },
-                "& .MuiInputBase-input": {
-                  color: "#000000",
-                  padding: "14px 14px",
+                  "&:hover fieldset": {
+                    borderColor: "#000000",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#000000",
+                  },
                 },
               }}
             />
           </ListItem>
 
-          <ListItem sx={{ display: "block", padding: "0" }}>
-            <ListItemText primary="short break" />
+          <ListItem sx={{ display: "block" }}>
             <TextField
               type="text"
-              variant="filled"
+              label="short break"
+              variant="outlined"
               value={shortBreak}
               onKeyDown={(e) => {
                 if (["e", "E", "+", "-"].includes(e.key)) {
@@ -179,28 +188,33 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
                   setShortBreak(shortBreak);
                 }
               }}
+              InputLabelProps={{
+                style: { color: "rgba(0, 0, 0, 0.6)" },
+              }}
               sx={{
-                width: "100px",
-                "& .MuiFilledInput-root": {
-                  backgroundColor: "#E5E5E5",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  "&:after": {
-                    borderBottom: "2px solid #2697A3",
+                fontFamily: "Montserrat, Arial, sans",
+                input: { color: "#000000" },
+                "& .MuiOutlinedInput-root": {
+                  fontFamily: "Montserrat, Arial, sans",
+                  "& fieldset": {
+                    borderColor: "rgba(0, 0, 0, 0.4)",
+                    borderRadius: "16px",
                   },
-                },
-                "& .MuiInputBase-input": {
-                  color: "#000000",
-                  padding: "14px 14px",
+                  "&:hover fieldset": {
+                    borderColor: "#000000",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#000000",
+                  },
                 },
               }}
             />
           </ListItem>
-          <ListItem sx={{ display: "block", padding: "0" }}>
-            <ListItemText primary="long break" />
+          <ListItem sx={{ display: "block" }}>
             <TextField
               type="text"
-              variant="filled"
+              label="long break"
+              variant="outlined"
               value={longBreak}
               onKeyDown={(e) => {
                 if (["e", "E", "+", "-"].includes(e.key)) {
@@ -221,19 +235,24 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
                   setLongBreak(longBreak);
                 }
               }}
+              InputLabelProps={{
+                style: { color: "rgba(0, 0, 0, 0.6)" },
+              }}
               sx={{
-                width: "100px",
-                "& .MuiFilledInput-root": {
-                  backgroundColor: "#E5E5E5",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  "&:after": {
-                    borderBottom: "2px solid #2697A3",
+                fontFamily: "Montserrat, Arial, sans",
+                input: { color: "#000000" },
+                "& .MuiOutlinedInput-root": {
+                  fontFamily: "Montserrat, Arial, sans",
+                  "& fieldset": {
+                    borderColor: "rgba(0, 0, 0, 0.4)",
+                    borderRadius: "16px",
                   },
-                },
-                "& .MuiInputBase-input": {
-                  color: "#000000",
-                  padding: "14px 14px",
+                  "&:hover fieldset": {
+                    borderColor: "#000000",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#000000",
+                  },
                 },
               }}
             />
@@ -243,7 +262,7 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
         <DialogActions>
           <button
             onClick={handleSave}
-            className="p-2 border-2 border-black rounded-2xl transition duration-200 hover:shadow-lg hover:scale-105"
+            className="p-2 border-2 border-black rounded-2xl transition duration-200 hover:shadow-lg hover:scale-105 font-bold"
           >
             save
           </button>

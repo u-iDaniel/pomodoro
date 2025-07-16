@@ -1,17 +1,16 @@
 "use client";
-import * as React from 'react';
-import { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { deepPurple } from '@mui/material/colors';
+import * as React from "react";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  IconButton,
+  Divider,
+  Fade,
+} from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
+import { useEffect, useState } from "react";
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
@@ -27,13 +26,14 @@ export default function BlockList() {
     }
     return [];
   });
-  const [newSite, setNewSite] = useState('');
+
+  const [newSite, setNewSite] = useState("");
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('blockedSites', JSON.stringify(blockedSites));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("blockedSites", JSON.stringify(blockedSites));
       window.postMessage({
-        type: 'BLOCKED_SITES_UPDATE',
+        type: "BLOCKED_SITES_UPDATE",
         blockedSites: blockedSites,
       });
     }
@@ -47,7 +47,7 @@ export default function BlockList() {
 
     if (newSite.trim() !== '' && !blockedSites.includes(newSite.trim())) {
       setBlockedSites([...blockedSites, newSite.trim()]);
-      setNewSite('');
+      setNewSite("");
     }
   };
 
@@ -56,79 +56,187 @@ export default function BlockList() {
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       event.preventDefault();
       handleAddSite();
     }
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 500, bgcolor: 'grey.100', color: 'black', margin: 'auto', mt: 4, border: '1px solid', borderColor: 'divider', borderRadius: 1, mb: 4 }}>
-      <Typography variant="h4" sx={{ p: 2 }}>
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: 600,
+        bgcolor: "rgba(0, 0, 0, 0.15)",
+        color: "white",
+        borderRadius: "20px",
+        boxShadow: 3,
+        p: 3,
+        mx: "auto",
+        fontFamily: "Montserrat, Arial, sans-serif",
+        transition: "all 0.3s ease-in-out",
+        mt: 4, // match spacing above TaskList
+      }}
+    >
+      <Typography
+        variant="h6"
+        fontWeight="bold"
+        marginBottom="1rem"
+        paddingTop="0.5rem"
+      >
         block distracting websites
       </Typography>
-      <Typography variant="body2" sx={{ p: 2 }}>
-        add websites you find distracting to this list. these websites will be blocked during your pomodoro sessions. note that you will need to install the chrome extension to do so.
+
+      <Divider sx={{ backgroundColor: "white", mb: 2 }} />
+
+      <Typography variant="body2" sx={{ color: "white", mb: 2 }}>
+        add websites you find distracting to this list. they will be blocked
+        during your pomodoro sessions.
       </Typography>
       {(!session?.user?.isMember &&
         <Typography variant="body2" sx={{ p: 2, color: 'red' }}>
           you can block up to 3 websites as a free user. <Link href={"/pricing"} className='underline'>become a member</Link> to block more!
         </Typography>
       )}
-      <Divider />
-      <Box sx={{ p: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+
+      <Box
+        sx={{
+          display: "flex",
+          gap: 1,
+          mb: 3,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
         <TextField
-          label="enter a website pattern to block"
+          label="enter website"
           variant="outlined"
           value={newSite}
           onChange={(e) => setNewSite(e.target.value)}
           onKeyDown={handleKeyPress}
+          autoComplete="off"
           fullWidth
-          autoComplete='off'
           size="small"
+          InputLabelProps={{
+            style: { color: "rgba(255, 255, 255, 0.6)" },
+          }}
           sx={{
-            input: { color: 'black' },
-            '& .MuiInputLabel-root': {
-              color: 'grey.700',
-            },
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': {
-                borderColor: 'grey.500',
+            input: { color: "white" },
+            "& .MuiOutlinedInput-root": {
+              fontFamily: "Montserrat, Arial, sans-serif",
+              borderRadius: "16px",
+              "& fieldset": {
+                borderColor: "rgba(255, 255, 255, 0.3)",
+              },
+              "&:hover fieldset": {
+                borderColor: "white",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "white",
               },
             },
           }}
         />
-        <Button variant="contained" onClick={handleAddSite}>
+        <Button
+          variant="outlined"
+          onClick={handleAddSite}
+          sx={{
+            color: "white",
+            borderColor: "white",
+            border: "2px solid white",
+            fontWeight: "bold",
+            fontFamily: "Montserrat, Arial, sans-serif",
+            borderRadius: "16px",
+            px: 3,
+            py: 1,
+            textTransform: "none",
+            whiteSpace: "nowrap",
+            transition: "transform 0.2s ease",
+            "&:hover": {
+              transform: "scale(1.05)",
+              backgroundColor: "rgba(255, 255, 255, 0.08)",
+            },
+          }}
+        >
           add
         </Button>
       </Box>
-      <Divider>your blocked websites:</Divider>
-      <List sx={{ pt: 0 }}>
+
+      <Typography
+        variant="h6"
+        fontWeight="bold"
+        marginBottom="1rem"
+        paddingTop="0.5rem"
+      >
+        your blocked websites
+      </Typography>
+
+      <Divider sx={{ backgroundColor: "white", mb: 2 }} />
+
+      <Box>
         {blockedSites.length > 0 ? (
           blockedSites.map((site) => (
-            <React.Fragment key={site}>
-              <Divider />
-              <ListItem
-                sx={{ color: deepPurple["800"]  }}
-                secondaryAction={
-                  <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveSite(site)}>
-                    <DeleteIcon color='error' />
-                  </IconButton>
-                }
+            <Fade in key={site}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  borderRadius: "12px",
+                  padding: "12px",
+                  marginBottom: "12px",
+                  backgroundColor: "rgba(38, 151, 163, 0.12)",
+                  border: "1px solid white",
+                  color: "white",
+                  fontWeight: 500,
+                  userSelect: "none",
+                  wordBreak: "break-word",
+                }}
               >
-                <ListItemText primary={site} />
-              </ListItem>
-            </React.Fragment>
+                <Typography
+                  sx={{
+                    fontFamily: "Montserrat, Arial, sans-serif",
+                    maxWidth: "calc(100% - 56px)",
+                  }}
+                >
+                  {site}
+                </Typography>
+                <IconButton
+                  onClick={() => handleRemoveSite(site)}
+                  sx={{
+                    color: "white",
+                    border: "2px solid white",
+                    borderRadius: "12px",
+                    ml: 2,
+                    transition:
+                      "transform 0.2s ease, color 0.2s ease, border-color 0.2s ease",
+                    "&:hover": {
+                      color: "#FF5555",
+                      borderColor: "#FF5555",
+                      transform: "scale(1.05)",
+                    },
+                  }}
+                  size="small"
+                >
+                  <ClearIcon />
+                </IconButton>
+              </Box>
+            </Fade>
           ))
         ) : (
-          <>
-            <Divider />
-            <ListItem>
-              <ListItemText primary="no websites are currently blocked." sx={{ textAlign: 'center', color: 'blue' }} />
-            </ListItem>
-          </>
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 2,
+              opacity: 0.6,
+              textAlign: "center",
+              fontStyle: "italic",
+            }}
+          >
+            no websites are currently blocked
+          </Typography>
         )}
-      </List>
+      </Box>
     </Box>
   );
 }

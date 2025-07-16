@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState, useEffect } from "react";
+import { FC, useState } from "react";
 import {
   Dialog,
   DialogActions,
@@ -17,7 +17,6 @@ import { useSession } from "next-auth/react";
 interface DialogComponentProps {
   open: boolean;
   onClose: () => void;
-  taskID: number;
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
   tasks: Task[];
 }
@@ -30,80 +29,45 @@ interface Task {
   order: number;
 }
 
-const Edit: FC<DialogComponentProps> = ({
+const AddTask: FC<DialogComponentProps> = ({
   open,
   onClose,
-  taskID,
   setTasks,
   tasks,
 }) => {
+  const [newTask, setNewTask] = useState("");
+  const [numPomodoros, setNumPomodoros] = useState("1");
   const { data: session } = useSession();
-  const [newEditTask, setNewEditTask] = useState("");
-  const [editNumPomodoros, setEditNumPomodoros] = useState("1");
 
-  const saveEdit = () => {
-    let task_order = -1;
-    setTasks((prevTasks) =>
-      prevTasks.map((task) => {
-        if (task.id === taskID) {
-          task_order = task.order;
-          return {
-            ...task,
-            text: newEditTask.trim(),
-            completed: false,
-            numPomodoro: Number(editNumPomodoros),
-          };
-        } else {
-          return task;
-        }
-      })
-    );
+  const saveTask = async (task: Task) => {
+    if (!session?.user) return;
+    try {
+      await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...task, userid: session.user.id }),
+      });
+    } catch {
+      alert("Error saving task");
+    }
+  };
 
-    saveEditData({
-      id: taskID,
-      text: newEditTask.trim(),
+  const saveAdd = () => {
+    if (newTask.trim() === "") return;
+    const new_id = Date.now();
+
+    const task = {
+      id: new_id,
+      text: newTask.trim(),
       completed: false,
-      numPomodoro: Number(editNumPomodoros),
-      order: task_order,
-    });
+      numPomodoro: Number(numPomodoros),
+      order: Number(tasks.length + 1),
+    };
+    setTasks((prev) => [...prev, task]);
+    saveTask(task);
+    setNewTask("");
     onClose();
   };
-
-  const saveEditData = async (task: Task) => {
-    if (session?.user) {
-      try {
-        const res = await fetch("/api/tasks", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: task.id,
-            userid: session.user.id,
-            text: task.text,
-            completed: task.completed,
-            numPomodoro: task.numPomodoro,
-            order: task.order,
-          }),
-        });
-
-        if (!res.ok) {
-          alert("Error editing task");
-        }
-      } catch (error) {
-        console.error("Error editing task:", error);
-        alert("Error editing task");
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (open) {
-      const task = tasks.find((t) => t.id === taskID);
-      if (task) {
-        setNewEditTask(task.text);
-        setEditNumPomodoros(String(task.numPomodoro));
-      }
-    }
-  }, [open, taskID, tasks]);
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -124,7 +88,7 @@ const Edit: FC<DialogComponentProps> = ({
           fontSize: "1.25rem",
         }}
       >
-        edit task
+        add task
       </DialogTitle>
       <Divider sx={{ backgroundColor: "rgba(0,0,0,0.1)" }} />
       <DialogContent
@@ -144,9 +108,9 @@ const Edit: FC<DialogComponentProps> = ({
               type="text"
               variant="outlined"
               label="task"
-              value={newEditTask}
+              value={newTask}
               autoComplete="off"
-              onChange={(e) => setNewEditTask(e.target.value)}
+              onChange={(e) => setNewTask(e.target.value)}
               InputLabelProps={{
                 style: { color: "rgba(0, 0, 0, 0.6)" },
               }}
@@ -174,25 +138,18 @@ const Edit: FC<DialogComponentProps> = ({
               type="text"
               variant="outlined"
               label="pomodoros"
-              value={editNumPomodoros}
+              value={numPomodoros}
               autoComplete="off"
               onKeyDown={(e) => {
-                if (["e", "E", "+", "-"].includes(e.key)) {
-                  e.preventDefault();
-                }
+                if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
               }}
               onChange={(e) => {
                 const val = e.target.value;
-                if (/^\d*\.?\d*$/.test(val)) {
-                  setEditNumPomodoros(val);
-                }
+                if (/^\d*\.?\d*$/.test(val)) setNumPomodoros(val);
               }}
               onBlur={() => {
-                if (
-                  editNumPomodoros === "" ||
-                  isNaN(Number(editNumPomodoros))
-                ) {
-                  setEditNumPomodoros("1");
+                if (numPomodoros === "" || isNaN(Number(numPomodoros))) {
+                  setNumPomodoros("1");
                 }
               }}
               InputLabelProps={{
@@ -223,7 +180,7 @@ const Edit: FC<DialogComponentProps> = ({
 
         <DialogActions sx={{ justifyContent: "flex-end" }}>
           <Button
-            onClick={saveEdit}
+            onClick={saveAdd}
             variant="outlined"
             sx={{
               px: 2,
@@ -233,7 +190,7 @@ const Edit: FC<DialogComponentProps> = ({
               color: "black",
               fontWeight: "bold",
               backgroundColor: "white",
-              borderRadius: "1rem",
+              borderRadius: "1rem", // matches rounded-2xl
               textTransform: "none",
               width: 120,
               transition: "transform 0.2s ease-in-out",
@@ -244,7 +201,7 @@ const Edit: FC<DialogComponentProps> = ({
               },
             }}
           >
-            save
+            add task
           </Button>
         </DialogActions>
       </DialogContent>
@@ -252,4 +209,4 @@ const Edit: FC<DialogComponentProps> = ({
   );
 };
 
-export default Edit;
+export default AddTask;
