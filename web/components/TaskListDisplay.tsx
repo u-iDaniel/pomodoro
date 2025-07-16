@@ -341,33 +341,34 @@ export default function TaskList() {
                     onDelete={clearTask}
                   />
                 ))}
-                <li
-                  onClick={handleAddOpen}
-                  style={{
-                    cursor: "pointer",
-                    borderRadius: "12px",
-                    padding: "12px",
-                    marginBottom: "12px",
-                    backgroundColor: "rgba(38, 151, 163, 0.12)",
-                    border: "1px solid white",
-                    color: "white",
-                    textAlign: "center",
-                    fontWeight: 500,
-                    userSelect: "none",
-                    transition: "background-color 0.3s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor =
-                      "rgba(38, 151, 163, 0.25)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor =
-                      "rgba(38, 151, 163, 0.12)")
-                  }
-                >
-                  + add task
-                </li>
               </ul>
+              <button
+                onClick={handleAddOpen}
+                style={{
+                  cursor: "pointer",
+                  borderRadius: "12px",
+                  padding: "12px",
+                  marginBottom: "12px",
+                  backgroundColor: "rgba(38, 151, 163, 0.12)",
+                  border: "1px solid white",
+                  color: "white",
+                  textAlign: "center",
+                  fontWeight: 500,
+                  userSelect: "none",
+                  transition: "background-color 0.3s ease",
+                  width: "100%",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor =
+                    "rgba(38, 151, 163, 0.25)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor =
+                    "rgba(38, 151, 163, 0.12)")
+                }
+              >
+                + add task
+              </button>
             </Box>
           </SortableContext>
         </DndContext>
