@@ -16,7 +16,7 @@ interface Playlist {
   id: string;
   name: string;
   description: string;
-  images?: { url: string }[];
+  images: { url: string }[];
 }
 
 export default function MusicPlayer() {
