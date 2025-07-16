@@ -249,22 +249,17 @@ const Edit: FC<DialogComponentProps> = ({
             onClick={saveEdit}
             variant="outlined"
             sx={{
-              px: 2,
-              py: 1,
-              borderWidth: "2px",
-              borderColor: "black",
+              marginTop: "1rem",
               color: "black",
-              fontWeight: "bold",
-              backgroundColor: "white",
-              borderRadius: "1rem",
+              borderColor: "black",
+              borderRadius: "16px",
               textTransform: "none",
-              width: 120,
-              transition: "transform 0.2s ease-in-out",
-              "&:hover": {
-                backgroundColor: "white",
-                borderColor: "black",
-                transform: "scale(1.05)",
-              },
+              fontWeight: "bold",
+              borderWidth: 2,
+              transition: "transform 0.2s ease",
+              "&:hover": { transform: "scale(1.05)" },
+              minWidth: 64,
+              px: 1.5,
             }}
           >
             save

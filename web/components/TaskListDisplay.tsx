@@ -79,19 +79,6 @@ export default function TaskList() {
     useSensor(KeyboardSensor)
   );
 
-  const saveTask = async (task: Task) => {
-    if (!session?.user) return;
-    try {
-      await fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...task, userid: session.user.id }),
-      });
-    } catch {
-      alert("Error saving task");
-    }
-  };
-
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (active.id !== over?.id) {
@@ -276,7 +263,6 @@ export default function TaskList() {
         display: "flex",
         flexDirection: "column",
         p: 3,
-        mt: 4,
       }}
     >
       {/* Header with collapse toggle */}
@@ -285,7 +271,6 @@ export default function TaskList() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 2,
           cursor: "pointer",
         }}
         onClick={() => setTaskListCollapsed((prev) => !prev)}
@@ -302,8 +287,6 @@ export default function TaskList() {
         </IconButton>
       </Box>
 
-      <Divider sx={{ backgroundColor: "white", mb: 2 }} />
-
       <Collapse in={!taskListCollapsed} timeout={400}>
         <Button
           onClick={handleAIOpen}
@@ -314,6 +297,8 @@ export default function TaskList() {
             fontWeight: "bold",
             borderRadius: "16px",
             textTransform: "none",
+            marginTop: "1rem",
+            marginBottom: 2,
             px: 4,
             py: 1.5,
             boxShadow: "0px 0px 10px rgba(0,212,255,0.4)",
@@ -329,10 +314,6 @@ export default function TaskList() {
         >
           ✨ generate with AI
         </Button>
-
-        <Divider
-          sx={{ backgroundColor: "rgba(255,255,255,0.2)", mt: 2, mb: 2 }}
-        />
 
         <DndContext
           sensors={sensors}

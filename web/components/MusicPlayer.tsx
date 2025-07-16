@@ -102,10 +102,6 @@ export default function MusicPlayer() {
   return (
     <Box
       sx={{
-        position: "absolute",
-        bottom: "1.25rem",
-        left: "1.25rem",
-        width: isCollapsed ? 280 : 600,
         backgroundColor: "rgba(0, 0, 0, 0.15)",
         borderRadius: "20px",
         p: 3,
@@ -126,19 +122,15 @@ export default function MusicPlayer() {
           cursor: "pointer",
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: "bold", marginBottom: "1rem" }}
-        >
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           music player <HeadphonesIcon sx={{ verticalAlign: "middle" }} />
         </Typography>
-        <IconButton sx={{ color: "white", marginBottom: "1rem" }}>
-          {isCollapsed ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        <IconButton sx={{ color: "white" }}>
+          {isCollapsed ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
         </IconButton>
       </Box>
-
-      {!isCollapsed &&
-        (session?.user.isMember ? (
+      <Collapse in={!isCollapsed} timeout={400} unmountOnExit>
+        {session?.user.isMember ? (
           <Box
             sx={{
               flexGrow: 1,
@@ -222,7 +214,12 @@ export default function MusicPlayer() {
                         }}
                       >
                         <img
-                          src={playlist.images[0]?.url}
+                          src={
+                            Array.isArray(playlist.images) &&
+                            playlist.images.length > 0
+                              ? playlist.images[0].url
+                              : ""
+                          }
                           alt={playlist.name}
                           width={50}
                           height={50}
@@ -256,7 +253,20 @@ export default function MusicPlayer() {
                     },
                   }}
                   sx={{
-                    width: "100%",
+                    input: { color: "white" },
+                    "& .MuiOutlinedInput-root": {
+                      fontFamily: "Montserrat, Arial, sans-serif",
+                      borderRadius: "16px",
+                      "& fieldset": {
+                        borderColor: "rgba(255, 255, 255, 0.3)",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "white",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "white",
+                      },
+                    },
                   }}
                 />
                 <Button
@@ -291,13 +301,26 @@ export default function MusicPlayer() {
             </Typography>
             <Button
               variant="outlined"
-              sx={{ mt: 2, color: "white", borderColor: "white" }}
+              sx={{
+                marginTop: 2,
+                color: "white",
+                borderColor: "white",
+                borderRadius: "16px",
+                textTransform: "none",
+                fontWeight: "bold",
+                borderWidth: 2,
+                transition: "transform 0.2s ease",
+                "&:hover": { transform: "scale(1.05)" },
+                minWidth: 64,
+                px: 1.5,
+              }}
               onClick={() => router.push("/pricing")}
             >
               get premium
             </Button>
           </Box>
-        ))}
+        )}
+      </Collapse>
     </Box>
   );
 }
