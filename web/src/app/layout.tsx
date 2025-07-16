@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import RootLayoutClient from "./layoutClient";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({
       >
         <RootLayoutClient>{children}</RootLayoutClient>
       </body>
+      <Script defer src="https://analytics.pomoai.tech/script.js" data-website-id="e25f45c5-62fa-4bd4-a6dc-2cf4cd8eba0c"/>
     </html>
   );
 }
