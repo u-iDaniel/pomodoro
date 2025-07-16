@@ -229,9 +229,16 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
             value={generateText}
             autoComplete="off"
             onChange={(e) => setGenerateText(e.target.value)}
-            InputLabelProps={{
-              style: { color: "rgba(0, 0, 0, 0.6)" },
-            }}
+            slotProps={
+              {
+                inputLabel: {
+                  style: { color: "rgba(0, 0, 0, 0.6)" },
+                },
+                input: {
+                  style: { color: "#000000", fontFamily: "Montserrat, Arial, sans" },
+                },
+              }
+            }
             sx={{
               fontFamily: "Montserrat, Arial, sans",
               input: { color: "#000000" },
@@ -339,6 +346,11 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
                 transform: isGenerateDisabled ? "none" : "scale(1.05)",
                 backgroundColor: "transparent",
               },
+              "&:disabled": {
+                cursor: "not-allowed",
+                backgroundColor: "rgba(0, 0, 0, 0.1)",
+                color: "rgba(0, 0, 0, 0.5)",
+              }
             }}
           >
             {loading ? "generating..." : "generate"}
