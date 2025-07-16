@@ -3,9 +3,6 @@ import {
   Typography,
   Button,
   TextField,
-  Collapse,
-  Fade,
-  Divider,
   IconButton,
 } from "@mui/material";
 import HeadphonesIcon from "@mui/icons-material/Headphones";
@@ -222,7 +219,7 @@ export default function MusicPlayer() {
                         }}
                       >
                         <img
-                          src={playlist.images[0]?.url}
+                          src={playlist?.images[0]?.url}
                           alt={playlist.name}
                           width={50}
                           height={50}

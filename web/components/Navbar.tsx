@@ -9,7 +9,6 @@ import Settings from "./Settings";
 import Link from "next/link";
 import "@fontsource/montserrat/200.css";
 import { useRouter } from "next/navigation";
-import TaskButton from "./TaskButton";
 
 interface NavbarProps {
   title: string;

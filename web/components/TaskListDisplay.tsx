@@ -79,26 +79,13 @@ export default function TaskList() {
     useSensor(KeyboardSensor)
   );
 
-  const saveTask = async (task: Task) => {
-    if (!session?.user) return;
-    try {
-      await fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...task, userid: session.user.id }),
-      });
-    } catch {
-      alert("Error saving task");
-    }
-  };
-
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (active.id !== over?.id) {
       const oldIndex = tasks.findIndex((t) => t.id === active.id);
       const newIndex = tasks.findIndex((t) => t.id === over?.id);
 
-      let arrangeTasks = arrayMove(tasks, oldIndex, newIndex).map(
+      const arrangeTasks = arrayMove(tasks, oldIndex, newIndex).map(
         (task, index) => ({
           ...task,
           order: index + 1,
@@ -221,7 +208,7 @@ export default function TaskList() {
         body: JSON.stringify({ id: task.id, userid: session.user.id }),
       });
     } catch (error) {
-      alert("Error deleting task");
+      alert(`Error deleting task ${error}`);
     }
   };
 
@@ -234,7 +221,7 @@ export default function TaskList() {
         body: JSON.stringify({ userid: session.user.id }),
       });
     } catch (error) {
-      alert("Error deleting all tasks");
+      alert(`Error deleting all tasks ${error}`);
     }
   };
 
@@ -247,7 +234,7 @@ export default function TaskList() {
         body: JSON.stringify({ ...task, userid: session.user.id }),
       });
     } catch (error) {
-      alert("Error editing task");
+      alert(`Error updating task: ${error}`);
     }
   };
 
@@ -258,7 +245,7 @@ export default function TaskList() {
       const data = await res.json();
       setTasks(data.task_list);
     } catch (error) {
-      alert("Error loading tasks");
+      alert(`Error loading tasks: ${error}`);
     }
   };
 
