@@ -82,6 +82,7 @@ export default function UserLogin() {
       </div>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         {/* <MenuItem onClick={handleEditPreferences}>edit preferences</MenuItem> */}
+        <MenuItem><a href="https://forms.gle/P4YeEPDL9CP9rkXS8" target="_blank" rel="noopener noreferrer">feedback form</a></MenuItem>
         <MenuItem onClick={handlePricing}>pricing</MenuItem>
         <MenuItem onClick={handleTerms}>terms</MenuItem>
         <MenuItem onClick={handlePrivacy}>privacy</MenuItem>
