@@ -1,13 +1,4 @@
-import {
-  Box,
-  Typography,
-  Button,
-  TextField,
-  Collapse,
-  Fade,
-  Divider,
-  IconButton,
-} from "@mui/material";
+import { Box, Typography, Button, TextField, IconButton } from "@mui/material";
 import HeadphonesIcon from "@mui/icons-material/Headphones";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -19,7 +10,7 @@ interface Playlist {
   id: string;
   name: string;
   description: string;
-  images?: { url: string }[];
+  images: { url: string }[];
 }
 
 export default function MusicPlayer() {

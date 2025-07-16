@@ -105,29 +105,6 @@ const Edit: FC<DialogComponentProps> = ({
     }
   }, [open, taskID, tasks]);
 
-  const commonTextFieldSx = {
-    input: { color: "black", backgroundColor: "white" },
-    "& .MuiOutlinedInput-root": {
-      backgroundColor: "white",
-      borderRadius: "8px",
-      "& fieldset": {
-        borderColor: "black",
-      },
-      "&:hover fieldset": {
-        borderColor: "black",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "black",
-      },
-    },
-    "& .MuiInputLabel-root": {
-      color: "black",
-    },
-    "& .MuiInputLabel-root.Mui-focused": {
-      color: "black",
-    },
-  };
-
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogActions sx={{ backgroundColor: "white", color: "black" }}>
