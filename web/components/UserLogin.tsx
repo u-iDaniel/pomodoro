@@ -53,7 +53,25 @@ export default function UserLogin() {
 
   return session ? (
     <>
-      <div className="flex items-center gap-4">
+      <div
+        className="flex items-center gap-4"
+        style={{
+          fontFamily: "Montserrat, Arial, sans",
+          textTransform: "none",
+          fontSize: "1.5rem",
+          color: "white",
+          borderRadius: "16px",
+          padding: "0.25rem 0.5rem", // paddingTop/Bottom = 1 (4px), paddingLeft/Right = 2 (8px)
+          backgroundColor: "#1E7D87",
+          transition: "background-color 0.2s ease",
+        }}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = "#186d73")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = "#1E7D87")
+        }
+      >
         <p>{session.user?.name}</p>
         <Avatar
           src={session.user?.image ?? undefined}
@@ -79,6 +97,13 @@ export default function UserLogin() {
         textTransform: "none",
         fontSize: "1.5rem",
         color: "white",
+        borderRadius: "16px",
+        px: 2,
+        py: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.15)",
+        "&:hover": {
+          backgroundColor: "rgba(0, 0, 0, 0.3)", // darker shade on hover
+        },
       }}
     >
       login/register

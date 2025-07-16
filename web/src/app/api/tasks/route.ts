@@ -7,6 +7,7 @@ interface Task {
   text: string;
   completed: boolean;
   numPomodoro: number;
+  order: number;
 }
 
 export async function POST(req: Request) {
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
         const task_text = task.text;
         const task_completed = task.completed;
         const task_pomodoros = task.numPomodoro;
+        const task_order = task.order;
 
         await prisma.task.create({ // Store task in database
             data: {
@@ -44,7 +46,8 @@ export async function POST(req: Request) {
                 userid: user_id,
                 text: task_text,
                 completed: task_completed,
-                numPomodoros: Number(task_pomodoros)
+                numPomodoros: Number(task_pomodoros),
+                order_task: task_order
             },
         });
 
@@ -54,7 +57,8 @@ export async function POST(req: Request) {
             user_id,
             task_text,
             task_completed,
-            task_pomodoros
+            task_pomodoros,
+            task_order
         }, { status: 201 });
     } catch (error) {
         console.error("Error processing task:", error);
@@ -75,15 +79,16 @@ export async function GET() {
                 userid: session.user.id!,
             },
             orderBy: {
-                taskid: 'asc'
+                order_task: 'asc'
             }
         });
 
         const task_list = task_list_temp.map((task) => ({
-            id: +task.taskid,
+            id: Number(task.taskid),
             text: task.text,
             completed: task.completed,
-            numPomodoro: task.numPomodoros
+            numPomodoro: task.numPomodoros,
+            order: Number(task.order_task)
         } satisfies Task))
 
         return NextResponse.json({ task_list }, { status: 200 });
@@ -164,6 +169,7 @@ export async function PATCH(req: Request) {
         const task_text = task.text;
         const task_completed = task.completed;
         const task_pomodoros = task.numPomodoro;
+        const task_order = task.order;
 
         await prisma.task.update({ // Store task in database
             where: {
@@ -173,7 +179,8 @@ export async function PATCH(req: Request) {
             data: {
                 text: task_text,
                 completed: task_completed,
-                numPomodoros: Number(task_pomodoros)
+                numPomodoros: Number(task_pomodoros),
+                order_task: task_order
             },
         });
 
@@ -183,7 +190,8 @@ export async function PATCH(req: Request) {
             user_id,
             task_text,
             task_completed,
-            task_pomodoros
+            task_pomodoros,
+            task_order
         }, { status: 201 });
     } catch (error) {
         console.error("Error processing task edit:", error);

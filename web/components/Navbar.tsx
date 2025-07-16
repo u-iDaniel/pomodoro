@@ -9,7 +9,6 @@ import Settings from "./Settings";
 import Link from "next/link";
 import "@fontsource/montserrat/200.css";
 import { useRouter } from "next/navigation";
-import TaskButton from "./TaskButton";
 
 interface NavbarProps {
   title: string;
@@ -39,22 +38,28 @@ export default function Navbar({ title, titleHref = "/" }: NavbarProps) {
           </Link>
         </div>
 
-
         <div className="flex gap-5">
           <Button
-              startIcon={<AppBlocking />}
-              sx={{
-                fontFamily: "Montserrat, Arial, sans",
-                textTransform: "none",
-                fontSize: "1.5rem",
-                color: "white",
-              }}
-              onClick={() => router.push("/blocklist")}
-            >
-              block list
+            startIcon={<AppBlocking />}
+            sx={{
+              fontFamily: "Montserrat, Arial, sans",
+              textTransform: "none",
+              fontSize: "1.5rem",
+              color: "white",
+              borderRadius: "16px",
+              px: 2,
+              py: 1,
+              backgroundColor: "rgba(0, 0, 0, 0.15)",
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.3)", // darker shade on hover
+              },
+            }}
+            onClick={() => router.push("/blocklist")}
+          >
+            block list
           </Button>
 
-          <TaskButton />
+          {/* <TaskButton /> */}
 
           <Button
             startIcon={<SettingsIcon />}
@@ -63,6 +68,13 @@ export default function Navbar({ title, titleHref = "/" }: NavbarProps) {
               textTransform: "none",
               fontSize: "1.5rem",
               color: "white",
+              borderRadius: "16px",
+              px: 2,
+              py: 1,
+              backgroundColor: "rgba(0, 0, 0, 0.15)",
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.3)", // darker shade on hover
+              },
             }}
             onClick={handleSettingsOpen}
           >
