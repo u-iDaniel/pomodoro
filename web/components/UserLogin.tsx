@@ -49,7 +49,7 @@ export default function UserLogin() {
   const handleTerms = () => {
     router.push("/terms");
     handleClose();
-  }
+  };
 
   return session ? (
     <>
