@@ -11,17 +11,17 @@ import {
 } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 import { useEffect, useState } from "react";
-import { useSession } from 'next-auth/react';
-import Link from 'next/link';
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 export default function BlockList() {
   const { data: session } = useSession();
   const [blockedSites, setBlockedSites] = useState<string[]>(() => {
-    if (typeof window !== 'undefined' && session?.user?.isMember) {
-      const savedSites = localStorage.getItem('blockedSites');
+    if (typeof window !== "undefined" && session?.user?.isMember) {
+      const savedSites = localStorage.getItem("blockedSites");
       return savedSites ? JSON.parse(savedSites) : [];
-    } else if (typeof window !== 'undefined' && !session?.user?.isMember) {
-      const savedSites = localStorage.getItem('blockedSites');
+    } else if (typeof window !== "undefined" && !session?.user?.isMember) {
+      const savedSites = localStorage.getItem("blockedSites");
       return savedSites ? JSON.parse(savedSites).slice(0, 3) : [];
     }
     return [];
@@ -41,11 +41,11 @@ export default function BlockList() {
 
   const handleAddSite = () => {
     if (!session?.user?.isMember && blockedSites.length >= 3) {
-      alert('become a member to block more than 3 websites!');
+      alert("become a member to block more than 3 websites!");
       return;
     }
 
-    if (newSite.trim() !== '' && !blockedSites.includes(newSite.trim())) {
+    if (newSite.trim() !== "" && !blockedSites.includes(newSite.trim())) {
       setBlockedSites([...blockedSites, newSite.trim()]);
       setNewSite("");
     }
@@ -93,9 +93,13 @@ export default function BlockList() {
         add websites you find distracting to this list. they will be blocked
         during your pomodoro sessions.
       </Typography>
-      {(!session?.user?.isMember &&
-        <Typography variant="body2" sx={{ p: 2, color: 'red' }}>
-          you can block up to 3 websites as a free user. <Link href={"/pricing"} className='underline'>become a member</Link> to block more!
+      {!session?.user?.isMember && (
+        <Typography variant="body2" sx={{ mb: 2, color: "#00FF37" }}>
+          you can block up to 3 websites as a free user.{" "}
+          <Link href={"/pricing"} className="underline">
+            become a member
+          </Link>{" "}
+          to block more!
         </Typography>
       )}
 

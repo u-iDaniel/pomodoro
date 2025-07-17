@@ -44,12 +44,15 @@ export default function Timer() {
   }, []);
 
   const playSound = useCallback(() => {
-    const sound = new Audio(
-      "/sounds/mixkit-kids-cartoon-close-bells-2256 (1).mp3"
-    );
-    sound.play().catch((error) => {
-      console.error("Audio playback failed:", error);
-    });
+    const notificationEnabled = localStorage.getItem("notification");
+    if (notificationEnabled === "true") {
+      const sound = new Audio(
+        "/sounds/mixkit-kids-cartoon-close-bells-2256 (1).mp3"
+      );
+      sound.play().catch((error) => {
+        console.error("Audio playback failed:", error);
+      });
+    }
   }, []);
 
   const timeFormat = useCallback((totalSeconds: number) => {
@@ -71,7 +74,7 @@ export default function Timer() {
   useEffect(() => {
     // Initialize worker on first mount
     if (!workerRef.current) {
-      const workerUrl = new URL('../public/timerWorker.js', import.meta.url); // has to be js to be loaded in the browser (typescript will not work)
+      const workerUrl = new URL("../public/timerWorker.js", import.meta.url); // has to be js to be loaded in the browser (typescript will not work)
       workerRef.current = new Worker(workerUrl);
       // Receives messages from the worker and sets timeLeft
       workerRef.current.onmessage = (e) => {
@@ -82,7 +85,7 @@ export default function Timer() {
 
     if (isActive && timeLeft > 0) {
       // Post message to worker to start countdown
-      workerRef.current.postMessage({ 
+      workerRef.current.postMessage({
         action: "START",
         timeLeft: Math.round(timeLeft),
       });
@@ -104,8 +107,8 @@ export default function Timer() {
       timeLeft: timeFormat(timeLeft),
       isActive: isActive,
     });
-}, [currentMode, isActive, timeFormat, timeLeft]);
-  
+  }, [currentMode, isActive, timeFormat, timeLeft]);
+
   // Cleanup worker on unmount
   useEffect(() => {
     return () => {
@@ -115,7 +118,7 @@ export default function Timer() {
       }
     };
   }, []);
-  
+
   // Handle timer completion
   const handleTimerComplete = useCallback(() => {
     if (timerCompleteHandled.current) return;
@@ -205,7 +208,6 @@ export default function Timer() {
       timerCompleteHandled.current = false;
     }
   }, [timeLeft]);
-
 
   // Event handler functions
   const pomodoroTimer = useCallback(() => {
