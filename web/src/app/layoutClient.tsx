@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import "./globals.css";
 import { useEffect, useState } from "react";
 import { TimerProvider } from "@/components/TimerContext";
+import React from "react";
 
 interface RootLayoutClientProps {
   children: React.ReactNode;

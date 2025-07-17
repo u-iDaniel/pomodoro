@@ -20,6 +20,7 @@ import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 
 import TextField from "@mui/material/TextField";
 import { useTimer } from "./TimerContext";
+import React from "react";
 
 interface DialogComponentProps {
   open: boolean;

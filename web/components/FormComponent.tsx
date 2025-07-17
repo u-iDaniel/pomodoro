@@ -2,6 +2,7 @@
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import React from "react";
 
 export default function FormComponent() {
   const router = useRouter();
@@ -44,7 +45,8 @@ export default function FormComponent() {
       <div className="bg-white w-4/5 px-20 py-8 text-black mt-8 flex flex-col gap-4 rounded-lg">
         <h2 className="text-5xl m-auto">personalize your breaks!</h2>
         <p className="text-2xl m-auto">
-          we want to make sure your pomodoro session works for you. customize your break experience that suits your style.
+          we want to make sure your pomodoro session works for you. customize
+          your break experience that suits your style.
         </p>
         <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-2">
           <label htmlFor="music">describe the music that you enjoy</label>

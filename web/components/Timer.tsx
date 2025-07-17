@@ -8,6 +8,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 import { useTimer } from "@/components/TimerContext";
 import "@fontsource/montserrat/300.css";
 import "@fontsource/montserrat/200.css";
+import React from "react";
 
 export default function Timer() {
   const {

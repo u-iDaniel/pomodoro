@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useSession } from "next-auth/react";
+import React from "react";
 
 interface DialogComponentProps {
   open: boolean;

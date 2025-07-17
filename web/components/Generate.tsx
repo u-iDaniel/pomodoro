@@ -15,6 +15,7 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { useSession } from "next-auth/react";
 import "@fontsource/montserrat/200.css";
 import PDFToText from "react-pdftotext";
+import React from "react";
 
 interface Task {
   id: number;
@@ -229,16 +230,17 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
             value={generateText}
             autoComplete="off"
             onChange={(e) => setGenerateText(e.target.value)}
-            slotProps={
-              {
-                inputLabel: {
-                  style: { color: "rgba(0, 0, 0, 0.6)" },
+            slotProps={{
+              inputLabel: {
+                style: { color: "rgba(0, 0, 0, 0.6)" },
+              },
+              input: {
+                style: {
+                  color: "#000000",
+                  fontFamily: "Montserrat, Arial, sans",
                 },
-                input: {
-                  style: { color: "#000000", fontFamily: "Montserrat, Arial, sans" },
-                },
-              }
-            }
+              },
+            }}
             sx={{
               fontFamily: "Montserrat, Arial, sans",
               input: { color: "#000000" },
@@ -350,7 +352,7 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
                 cursor: "not-allowed",
                 backgroundColor: "rgba(0, 0, 0, 0.1)",
                 color: "rgba(0, 0, 0, 0.5)",
-              }
+              },
             }}
           >
             {loading ? "generating..." : "generate"}

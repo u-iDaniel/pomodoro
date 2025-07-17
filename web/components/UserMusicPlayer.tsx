@@ -1,9 +1,20 @@
-import { Box, Typography, Button, List, ListItem, ListItemAvatar, Avatar, ListItemText, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  List,
+  ListItem,
+  ListItemAvatar,
+  Avatar,
+  ListItemText,
+  CircularProgress,
+} from "@mui/material";
 import HeadphonesIcon from "@mui/icons-material/Headphones";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import React from "react";
 
 interface Playlist {
   id: string;
@@ -17,7 +28,9 @@ export default function UserMusicPlayer() {
   const searchParams = useSearchParams();
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
+  const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,21 +61,22 @@ export default function UserMusicPlayer() {
         setIsLoading(true);
         setError(null);
         try {
-          const response = await fetch('/api/spotify/playlists', {
+          const response = await fetch("/api/spotify/playlists", {
             headers: {
-              'Authorization': `Bearer ${accessToken}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           });
 
           if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to fetch playlists');
+            throw new Error(errorData.error || "Failed to fetch playlists");
           }
 
           const data: Playlist[] = await response.json();
           setPlaylists(data);
         } catch (err: unknown) {
-          const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+          const errorMessage =
+            err instanceof Error ? err.message : "An unknown error occurred";
           setError(errorMessage);
           console.error(err);
         } finally {
@@ -73,7 +87,7 @@ export default function UserMusicPlayer() {
       fetchPlaylists();
     }
   }, [accessToken]);
-  
+
   const handleSpotifySignIn = async () => {
     window.location.href = "/api/spotify/signin";
   };
@@ -113,13 +127,36 @@ export default function UserMusicPlayer() {
         </Typography>
         <KeyboardArrowUpIcon sx={{ fontSize: 40 }} />
       </Box>
-      
-      <Box sx={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
+      <Box
+        sx={{
+          flexGrow: 1,
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         {!accessToken ? (
           <Button
             variant="contained"
-            endIcon={<Image src={"/spotify-icon.svg"} alt="Spotify Logo" width={24} height={24} />}
-            sx={{ backgroundColor: "#1DB954", color: "white", fontWeight: "bold", borderRadius: "50px", px: 4, py: 1.5, '&:hover': { backgroundColor: "#1ed760" } }}
+            endIcon={
+              <Image
+                src={"/spotify-icon.svg"}
+                alt="Spotify Logo"
+                width={24}
+                height={24}
+              />
+            }
+            sx={{
+              backgroundColor: "#1DB954",
+              color: "white",
+              fontWeight: "bold",
+              borderRadius: "50px",
+              px: 4,
+              py: 1.5,
+              "&:hover": { backgroundColor: "#1ed760" },
+            }}
             onClick={handleSpotifySignIn}
           >
             sign in with spotify
@@ -130,19 +167,29 @@ export default function UserMusicPlayer() {
           <Typography color="error">Error: {error}</Typography>
         ) : selectedPlaylist ? (
           // Show playlist embed
-          <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <Button
                 onClick={handleBackToPlaylists}
-                sx={{ color: 'white', minWidth: 'auto', p: 1, mr: 1 }}
+                sx={{ color: "white", minWidth: "auto", p: 1, mr: 1 }}
               >
                 ←
               </Button>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'white' }}>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: "bold", color: "white" }}
+              >
                 {selectedPlaylist.name}
               </Typography>
             </Box>
-            <Box sx={{ flexGrow: 1, borderRadius: '12px', overflow: 'hidden' }}>
+            <Box sx={{ flexGrow: 1, borderRadius: "12px", overflow: "hidden" }}>
               <iframe
                 src={`https://open.spotify.com/embed/playlist/${selectedPlaylist.id}?theme=0`}
                 width="100%"
@@ -151,31 +198,44 @@ export default function UserMusicPlayer() {
                 allowFullScreen
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 loading="lazy"
-                style={{ borderRadius: '12px' }}
+                style={{ borderRadius: "12px" }}
               />
             </Box>
           </Box>
         ) : (
           // Show playlist list
-          <List sx={{ width: '100%' }}>
+          <List sx={{ width: "100%" }}>
             {playlists.map((playlist) => (
-              <ListItem 
-                key={playlist.id} 
-                sx={{ 
-                  borderRadius: '8px', 
-                  mb: 1, 
-                  cursor: 'pointer',
-                  '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
+              <ListItem
+                key={playlist.id}
+                sx={{
+                  borderRadius: "8px",
+                  mb: 1,
+                  cursor: "pointer",
+                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
                 }}
                 onClick={() => handlePlaylistClick(playlist)}
               >
                 <ListItemAvatar>
-                  <Avatar variant="rounded" src={playlist.imageUrl} alt={playlist.name} />
+                  <Avatar
+                    variant="rounded"
+                    src={playlist.imageUrl}
+                    alt={playlist.name}
+                  />
                 </ListItemAvatar>
-                <ListItemText primary={playlist.name} secondary={playlist.description || 'No description'} 
+                <ListItemText
+                  primary={playlist.name}
+                  secondary={playlist.description || "No description"}
                   slotProps={{
-                    primary: { color: 'white', fontWeight: 'bold', noWrap: true },
-                    secondary: { color: 'rgba(255, 255, 255, 0.7)', noWrap: true }
+                    primary: {
+                      color: "white",
+                      fontWeight: "bold",
+                      noWrap: true,
+                    },
+                    secondary: {
+                      color: "rgba(255, 255, 255, 0.7)",
+                      noWrap: true,
+                    },
                   }}
                 />
               </ListItem>

@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     // Handle the event
     switch (event.type) {
-        case "payment_intent.succeeded":
+        case "payment_intent.succeeded": {
             const session = event.data.object as Stripe.PaymentIntent;
             const userId = session.metadata?.userId;
             if (!userId) {
@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
             });
             console.log("User membership updated:", data);
             break;
+        }
         default:
             console.warn(`Unhandled event type ${event.type}`);
     }
