@@ -2,7 +2,14 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { Box, Typography, Button, IconButton, Collapse } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Divider,
+  Button,
+  IconButton,
+  Collapse,
+} from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
@@ -12,7 +19,6 @@ import Edit from "../components/Edit";
 import Generate from "../components/Generate";
 import AddTask from "../components/AddTask";
 import { keyframes } from "@emotion/react";
-import React from "react";
 
 import {
   DndContext,

@@ -1,6 +1,5 @@
 "use client";
 import { createContext, useContext, useState } from "react";
-import React from "react";
 
 interface TimerContextType {
   pomodoroTime: string;
@@ -41,9 +40,7 @@ export const TimerProvider = ({ children }: { children: React.ReactNode }) => {
     "pomodoro" | "shortBreak" | "longBreak"
   >("pomodoro");
 
-  const [timeLeft, setTimeLeft] = useState(
-    Math.round(Number(pomodoroTime) * 60)
-  );
+  const [timeLeft, setTimeLeft] = useState(Math.round(Number(pomodoroTime) * 60));
   const [isActive, setIsActive] = useState(false);
 
   // Function to update mode and reset countdown

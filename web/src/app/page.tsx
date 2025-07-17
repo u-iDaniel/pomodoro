@@ -4,7 +4,6 @@ import TaskListDisplay from "@/components/TaskListDisplay";
 import Timer from "@/components/Timer";
 import { useSession } from "next-auth/react";
 import { Link } from "@mui/material";
-import React from "react";
 
 export default function Home() {
   const { data: session } = useSession();

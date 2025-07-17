@@ -10,7 +10,6 @@ import Link from "next/link";
 import "@fontsource/montserrat/200.css";
 import { useRouter } from "next/navigation";
 import DiamondIcon from "@mui/icons-material/Diamond";
-import React from "react";
 
 interface NavbarProps {
   title: string;

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import "@fontsource/montserrat/";
 import "@fontsource/montserrat/300.css";
-import React from "react";
 
 export default function Login() {
   const { data: session, status } = useSession();
@@ -14,9 +13,9 @@ export default function Login() {
   useEffect(() => {
     if (status === "authenticated") {
       // if (session?.user?.isNewUser) {
-      // router.push("/form"); // Redirect new users to /form
+        // router.push("/form"); // Redirect new users to /form
       // } else {
-      router.push("/"); // Redirect existing users to /
+        router.push("/"); // Redirect existing users to /
       // }
     }
   }, [session, status, router]);
