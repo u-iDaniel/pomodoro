@@ -2,14 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import {
-  Box,
-  Typography,
-  Divider,
-  Button,
-  IconButton,
-  Collapse,
-} from "@mui/material";
+import { Box, Typography, Button, IconButton, Collapse } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
