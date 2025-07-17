@@ -13,6 +13,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
     strategy: "jwt",
   },
+  cookies: {
+    pkceCodeVerifier: {
+      name: "pkceCodeVerifier",
+      options: {
+        httpOnly: true,
+        sameSite: "lax", // or "none" if cross-site
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   callbacks: {
       async signIn({ user }) {
         // console.log("Signing in user");
