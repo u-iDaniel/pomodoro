@@ -91,7 +91,8 @@ export default function BlockList() {
 
       <Typography variant="body2" sx={{ color: "white", mb: 2 }}>
         add websites you find distracting to this list. they will be blocked
-        during your pomodoro sessions.
+        during your pomodoro sessions. note that you will need the <a className="text-green-300 underline" href="https://chromewebstore.google.com/detail/pomoai-companion/plbflibgkoljgkhknkafeofjjnllpelc" target="_blank" rel="noopener noreferrer">chrome extension </a>
+        installed for this to work.
       </Typography>
       {!session?.user?.isMember && (
         <Typography variant="body2" sx={{ mb: 2, color: "#00FF37" }}>
