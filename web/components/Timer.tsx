@@ -63,9 +63,9 @@ export default function Timer() {
     ).padStart(2, "0")}`;
   }, []);
 
-  // Request notification permission on mount
+  // Request notification permission on mount (check if notification in window for iPhone compatibility)
   useEffect(() => {
-    if (Notification.permission !== "granted") {
+    if ('Notification' in window && Notification.permission !== "granted") {
       Notification.requestPermission();
     }
   }, []);
