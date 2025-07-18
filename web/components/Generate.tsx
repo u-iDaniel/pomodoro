@@ -15,6 +15,7 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { useSession } from "next-auth/react";
 import "@fontsource/montserrat/200.css";
 import PDFToText from "react-pdftotext";
+import { useRouter } from "next/navigation";
 
 interface Task {
   id: number;
@@ -35,6 +36,7 @@ const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
 const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
   const { data: session } = useSession();
+  const router = useRouter();
   const [mode, setMode] = useState<"text" | "pdf">("text");
   const [generateText, setGenerateText] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -79,6 +81,12 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
   };
 
   const generateResponse = async () => {
+    if (!session?.user?.isMember) {
+      onClose();
+      router.push("/pricing");
+      return;
+    }
+
     setLoading(true);
     try {
       await deleteAllTasks();

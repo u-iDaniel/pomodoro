@@ -9,6 +9,7 @@ import Settings from "./Settings";
 import Link from "next/link";
 import "@fontsource/montserrat/200.css";
 import { useRouter } from "next/navigation";
+import DiamondIcon from "@mui/icons-material/Diamond";
 
 interface NavbarProps {
   title: string;
@@ -39,6 +40,25 @@ export default function Navbar({ title, titleHref = "/" }: NavbarProps) {
         </div>
 
         <div className="flex gap-5">
+          <Button
+            startIcon={<DiamondIcon />}
+            sx={{
+              fontFamily: "Montserrat, Arial, sans",
+              textTransform: "none",
+              fontSize: "1.5rem",
+              color: "white",
+              borderRadius: "16px",
+              px: 2,
+              py: 1,
+              backgroundColor: "rgba(0, 0, 0, 0.15)",
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.3)", // darker shade on hover
+              },
+            }}
+            onClick={() => router.push("/pricing")}
+          >
+            pricing
+          </Button>
           <Button
             startIcon={<AppBlocking />}
             sx={{

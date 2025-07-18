@@ -14,6 +14,9 @@ import "@fontsource/montserrat/200.css";
 
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 
 import TextField from "@mui/material/TextField";
 import { useTimer } from "./TimerContext";
@@ -48,11 +51,19 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
     return stored ? stored : "15"; // Default 15 minutes
   });
 
+  const [notificationSoundEnabled, setNotificationSoundEnabled] = useState(
+    () => {
+      const stored = localStorage.getItem("notification");
+      return stored !== null ? stored === "true" : true;
+    }
+  );
+
   const handleSave = () => {
     // Store values in minutes in localStorage
     localStorage.setItem("pomodoroTime", String(pomodoro));
     localStorage.setItem("shortBreakTime", String(shortBreak));
     localStorage.setItem("longBreakTime", String(longBreak));
+    localStorage.setItem("notification", String(notificationSoundEnabled));
 
     // For actual timer
     setPomodoroTime(pomodoro);
@@ -258,14 +269,58 @@ const Settings: FC<DialogComponentProps> = ({ open, onClose }) => {
             />
           </ListItem>
         </List>
+        <p
+          style={{ paddingTop: "0px", fontSize: "1.25rem", fontWeight: "bold" }}
+        >
+          <NotificationImportantIcon /> notifications
+        </p>
+        <div className="flex justify-center">
+          <Button
+            variant="outlined"
+            onClick={() =>
+              setNotificationSoundEnabled(!notificationSoundEnabled)
+            }
+            startIcon={
+              notificationSoundEnabled ? <VolumeUpIcon /> : <VolumeOffIcon />
+            }
+            sx={{
+              marginTop: "1rem",
+              color: "black",
+              borderColor: "black",
+              borderRadius: "16px",
+              textTransform: "none",
+              fontWeight: "bold",
+              borderWidth: 2,
+              transition: "transform 0.2s ease",
+              "&:hover": { transform: "scale(1.05)" },
+              minWidth: 64,
+              px: 1.5,
+            }}
+          >
+            {notificationSoundEnabled ? "sound on" : "sound off"}
+          </Button>
+        </div>
 
         <DialogActions>
-          <button
+          <Button
+            variant="outlined"
             onClick={handleSave}
-            className="p-2 border-2 border-black rounded-2xl transition duration-200 hover:shadow-lg hover:scale-105 font-bold"
+            sx={{
+              marginTop: "1rem",
+              color: "black",
+              borderColor: "black",
+              borderRadius: "16px",
+              textTransform: "none",
+              fontWeight: "bold",
+              borderWidth: 2,
+              transition: "transform 0.2s ease",
+              "&:hover": { transform: "scale(1.05)" },
+              minWidth: 64,
+              px: 1.5,
+            }}
           >
             save
-          </button>
+          </Button>
         </DialogActions>
       </DialogContent>
     </Dialog>

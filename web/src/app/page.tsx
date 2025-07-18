@@ -3,6 +3,7 @@ import MusicPlayer from "@/components/MusicPlayer";
 import TaskListDisplay from "@/components/TaskListDisplay";
 import Timer from "@/components/Timer";
 import { useSession } from "next-auth/react";
+import { Link } from "@mui/material";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -28,24 +29,25 @@ export default function Home() {
           <Timer />
         </div>
       </main>
-      <div className="absolute top-[15%] right-5 w-[30%]">
+      <div className="absolute top-[20%] right-5 w-[30%]">
         <TaskListDisplay />
       </div>
 
-      <div className="w-[30%]">
-        {session?.user ? (
-          <div>
-            <MusicPlayer />
-          </div>
-        ) : (
-          <div className="absolute bottom-[30%]">
-            {/* want AI personalized break recommendations?{" "}
-            <Link className="underline" href={"/login"}>
-              sign up
-            </Link> */}
-          </div>
-        )}
-      </div>
+      {session?.user ? (
+        <div className="absolute top-[20%] left-5 w-[30%]">
+          <MusicPlayer />
+        </div>
+      ) : (
+        <div className="text-center text-white">
+          want access to premium features like AI and music?{" "}
+          <Link
+            className="underline text-white decoration-white"
+            href={"/login"}
+          >
+            sign up
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
