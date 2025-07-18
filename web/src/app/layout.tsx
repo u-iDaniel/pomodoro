@@ -16,6 +16,21 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "pomoAI",
   description: "AI-powered pomodoro app for focus and productivity.",
+  openGraph: {
+    title: "pomoAI",
+    description: "AI-powered pomodoro app for focus and productivity.",
+    url: "https://pomoai.tech",
+    siteName: "pomoAI",
+    images: [
+      {
+        url: "https://i.postimg.cc/HsYHmR7g/og.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
