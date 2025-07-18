@@ -16,6 +16,24 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "pomoAI",
   description: "AI-powered pomodoro app for focus and productivity.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+  },
+  keywords: [
+    "pomoAI",
+    "AI",
+    "pomodoro",
+    "timer",
+    "productivity",
+    "focus",
+    "task management",
+    "time management",
+    "work smarter",
+    "get things done",
+    "study",
+    "work",
+  ],
   openGraph: {
     title: "pomoAI",
     description: "AI-powered pomodoro app for focus and productivity.",
