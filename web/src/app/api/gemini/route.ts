@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/configuration/auth";
 import prisma from "@/lib/prisma";
 import { GoogleGenAI } from "@google/genai";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 interface Task {
   id: number;
@@ -11,8 +13,22 @@ interface Task {
   order: number;
 }
 
-export async function POST(req: Request) {
+const rateLimitFree = new Ratelimit({
+  redis: Redis.fromEnv(),                                  // Connects using env vars (URL + TOKEN)
+  limiter: Ratelimit.slidingWindow(5, "24 h"),   // 5 requests per 10 seconds per identifier
+  prefix: "@upstash/ratelimit",                   // Optional Redis key prefix
+  analytics: true                                 // Enables Upstash internal analytics
+});
 
+const rateLimitMember = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(100, "24 h"),  // 100 per day
+  prefix: "@upstash/ratelimit",
+  analytics: true
+})
+
+
+export async function POST(req: Request) {
 
     const session = await auth();
 
@@ -20,6 +36,20 @@ export async function POST(req: Request) {
 
     if (!session?.user) { // Checks if user is signed in and there is a valid API key
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const identifier = session.user.id;
+
+    let result;
+
+    if (session?.user?.isMember) {
+      result = await rateLimitMember.limit(identifier);
+    } else {
+      result = await rateLimitFree.limit(identifier);
+    }
+
+    if (!result.success) {
+      return NextResponse.json({ error: "Free users get 5 free generations per day, while members get 100 generation per day. Try again later." }, { status: 429 });
     }
 
     const formData = await req.formData();
