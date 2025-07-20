@@ -15,7 +15,6 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { useSession } from "next-auth/react";
 import "@fontsource/montserrat/200.css";
 import PDFToText from "react-pdftotext";
-import { useRouter } from "next/navigation";
 
 interface Task {
   id: number;
@@ -36,7 +35,6 @@ const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
 const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
   const { data: session } = useSession();
-  const router = useRouter();
   const [mode, setMode] = useState<"text" | "pdf">("text");
   const [generateText, setGenerateText] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -81,12 +79,6 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
   };
 
   const generateResponse = async () => {
-    if (!session?.user?.isMember) {
-      onClose();
-      router.push("/pricing");
-      return;
-    }
-
     setLoading(true);
     try {
       await deleteAllTasks();
@@ -102,10 +94,17 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
         formData.append("generateText", pdfText);
       }
 
-      await fetch("/api/gemini", {
+      const res = await fetch("/api/gemini", {
         method: "POST",
         body: formData,
       });
+
+      if (res.status === 429) {
+        const data = await res.json();
+        alert(data.error);
+        onClose();
+        return;
+      }
 
       await loadData();
     } catch (error) {
@@ -236,17 +235,19 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
             variant="outlined"
             value={generateText}
             autoComplete="off"
+            inputProps={{ maxLength: 3000 }}
             onChange={(e) => setGenerateText(e.target.value)}
-            slotProps={
-              {
-                inputLabel: {
-                  style: { color: "rgba(0, 0, 0, 0.6)" },
+            slotProps={{
+              inputLabel: {
+                style: { color: "rgba(0, 0, 0, 0.6)" },
+              },
+              input: {
+                style: {
+                  color: "#000000",
+                  fontFamily: "Montserrat, Arial, sans",
                 },
-                input: {
-                  style: { color: "#000000", fontFamily: "Montserrat, Arial, sans" },
-                },
-              }
-            }
+              },
+            }}
             sx={{
               fontFamily: "Montserrat, Arial, sans",
               input: { color: "#000000" },
@@ -358,7 +359,7 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
                 cursor: "not-allowed",
                 backgroundColor: "rgba(0, 0, 0, 0.1)",
                 color: "rgba(0, 0, 0, 0.5)",
-              }
+              },
             }}
           >
             {loading ? "generating..." : "generate"}
