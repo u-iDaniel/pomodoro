@@ -60,6 +60,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta
+          name="google-adsense-account"
+          content={process.env.ADSENSE_ID}
+        ></meta>
         <AdSense />
       </head>
       <body
