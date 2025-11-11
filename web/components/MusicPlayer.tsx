@@ -12,12 +12,23 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import PlaylistCard from "./PlaylistCard";
+import AlbumCard from "./AlbumCard";
 
 interface Playlist {
   id: string;
   name: string;
   description: string;
   images: { url: string }[];
+}
+
+interface Album {
+  id: string;
+  name: string;
+  images: { url: string }[];
+  release_date: string;
+  popularity: number;
+  artists: { name: string }[];
 }
 
 export default function MusicPlayer() {
@@ -29,20 +40,30 @@ export default function MusicPlayer() {
   );
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [recentPlaylists, setRecentPlaylists] = useState<Playlist[]>([]);
+  const [recentAlbums, setRecentAlbums] = useState<Album[]>([]);
+  const [isPlaylist, setIsPlaylist] = useState<boolean>(true); // determine if user wants playlist or album
 
   useEffect(() => {
     const storedPlaylists = localStorage.getItem("recentPlaylists");
     if (storedPlaylists) {
       setRecentPlaylists(JSON.parse(storedPlaylists));
     }
+    const storedAlbums = localStorage.getItem("recentAlbums");
+    if (storedAlbums) {
+      setRecentAlbums(JSON.parse(storedAlbums));
+    }
   }, []);
 
-  const extractPlaylistId = (input: string): string | null => {
+  // Accept both playlist and album URLs or raw IDs
+  const extractSpotifyId = (input: string): string | null => {
     try {
-      if (input.startsWith("https://open.spotify.com/playlist/")) {
+      if (input.startsWith("https://open.spotify.com/")) {
         const url = new URL(input);
-        const pathParts = url.pathname.split("/");
-        return pathParts[pathParts.length - 1];
+        // pathname removes domain and query params
+        const pathParts = url.pathname.split("/").filter(Boolean); // .filter removes empty strings
+        // /playlist/{id} or /album/{id}
+        const id = pathParts[pathParts.length - 1];
+        return id;
       }
       // Assuming it's a raw ID if not a URL
       return input;
@@ -51,8 +72,8 @@ export default function MusicPlayer() {
     }
   };
 
-  const handleSubmit = async () => {
-    const id = extractPlaylistId(playlistIdInput.trim());
+  const handlePlaylistSubmit = async () => {
+    const id = extractSpotifyId(playlistIdInput.trim());
     if (id) {
       try {
         const response = await fetch(`/api/spotify/playlist/${id}`);
@@ -63,7 +84,7 @@ export default function MusicPlayer() {
 
         if (playlistData.notFound) {
           alert(
-            "The resource was potentially not found. If it was a Spotify account playlist, it should still work."
+            "The playlist was potentially not found. If it was a Spotify account playlist, it should still work."
           );
           setSubmittedPlaylistId(id);
         } else {
@@ -88,12 +109,47 @@ export default function MusicPlayer() {
     }
   };
 
+  const handleAlbumSubmit = async () => {
+    const id = extractSpotifyId(playlistIdInput.trim());
+    if (id) {
+      try {
+        const response = await fetch(`/api/spotify/album/${id}`);
+        if (!response.ok) {
+          throw new Error("Album not found");
+        }
+        const albumData = await response.json();
+        if (albumData.notFound) {
+          alert("The album was potentially not found.");
+          setSubmittedPlaylistId(id);
+        } else {
+          setSubmittedPlaylistId(id);
+          const newRecentAlbums = [
+            albumData,
+            ...recentAlbums.filter((a) => a.id !== id),
+          ].slice(0, 5);
+          setRecentAlbums(newRecentAlbums);
+          localStorage.setItem("recentAlbums", JSON.stringify(newRecentAlbums));
+        }
+      } catch {
+        alert("Invalid Spotify Album URL or ID");
+      }
+    } else {
+      alert("Invalid Spotify Album URL or ID");
+    }
+  };
+
   const handleBack = () => {
     setSubmittedPlaylistId(null);
     setPlaylistIdInput("");
   };
 
   const handleRecentPlaylistClick = (id: string) => {
+    setIsPlaylist(true);
+    setSubmittedPlaylistId(id);
+  };
+
+  const handleRecentAlbumClick = (id: string) => {
+    setIsPlaylist(false);
     setSubmittedPlaylistId(id);
   };
 
@@ -156,7 +212,7 @@ export default function MusicPlayer() {
                     ←
                   </Button>
                   <Typography variant="h6" sx={{ color: "white" }}>
-                    connected playlist
+                    connected {isPlaylist ? " playlist" : " album"}
                   </Typography>
                 </Box>
                 <Box
@@ -168,7 +224,7 @@ export default function MusicPlayer() {
                   }}
                 >
                   <iframe
-                    src={`https://open.spotify.com/embed/playlist/${submittedPlaylistId}?theme=0`}
+                    src={`https://open.spotify.com/embed/${isPlaylist ? "playlist" : "album"}/${submittedPlaylistId}?theme=0&limit=10000`}
                     width="100%"
                     height="100%"
                     allowFullScreen
@@ -190,57 +246,77 @@ export default function MusicPlayer() {
                   pb: 2,
                 }}
               >
-                {recentPlaylists.length > 0 && (
-                  <Box sx={{ width: "100%", mb: 2 }}>
-                    <Typography variant="h6" sx={{ mb: 1 }}>
-                      recent playlists:
-                    </Typography>
-                    {recentPlaylists.map((playlist) => (
-                      <Box
-                        key={playlist.id}
-                        onClick={() => handleRecentPlaylistClick(playlist.id)}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 2,
-                          p: 1,
-                          borderRadius: "8px",
-                          cursor: "pointer",
-                          "&:hover": {
-                            backgroundColor: "rgba(255, 255, 255, 0.1)",
-                          },
-                        }}
-                      >
-                        <img
-                          src={
-                            Array.isArray(playlist.images) &&
-                            playlist.images.length > 0
-                              ? playlist.images[0].url
-                              : ""
-                          }
-                          alt={playlist.name}
-                          width={50}
-                          height={50}
-                          style={{ borderRadius: "4px" }}
-                        />
-                        <Box>
-                          <Typography sx={{ fontWeight: "bold" }}>
-                            {playlist.name}
-                          </Typography>
-                          <Typography variant="body2" sx={{ opacity: 0.7 }}>
-                            {playlist.description}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    ))}
+                <Box sx={{ width: "100%", mt: 2 }}>
+                  <Box sx={{ display: "flex", justifyContent: "center", gap: 4, mb: 2 }}>
+                    <button
+                      onClick={() => setIsPlaylist(true)}
+                      style={{
+                        borderRadius: "20px",
+                        backgroundColor: "transparent",
+                        borderWidth: "1px",
+                        borderStyle: "solid",
+                        borderColor: isPlaylist ? "#00FF37" : "white",
+                        padding: "10px 20px",
+                        color: isPlaylist ? "#00FF37" : "white",
+                        transition:
+                          "border-color 0.4s ease, color 0.4s ease",
+                        fontFamily: "Montserrat, Arial, sans",
+                        fontWeight: "200",
+                      }}
+                    >
+                      playlist
+                    </button>
+                    <button
+                      onClick={() => setIsPlaylist(false)}
+                      style={{
+                        borderRadius: "20px",
+                        backgroundColor: "transparent",
+                        borderWidth: "1px",
+                        borderStyle: "solid",
+                        borderColor: !isPlaylist ? "#ff5100" : "white",
+                        padding: "10px 20px",
+                        color: !isPlaylist ? "#ff5100" : "white",
+                        transition:
+                          "border-color 0.4s ease, color 0.4s ease",
+                        fontFamily: "Montserrat, Arial, sans",
+                        fontWeight: "200",
+                      }}
+                    >
+                      album
+                    </button>
                   </Box>
-                )}
-                <Typography sx={{ textAlign: "center" }}>
-                  enter a public Spotify playlist id or url (on the spotify app,
-                  go to share -{">"} copy link to playlist)
+
+                  {isPlaylist && recentPlaylists.length > 0 && (
+                    <Box>
+                      {recentPlaylists.map((playlist) => (
+                        <PlaylistCard
+                          key={playlist.id}
+                          playlist={playlist}
+                          onClick={handleRecentPlaylistClick}
+                        />
+                      ))}
+                    </Box>
+                  )}
+
+                  {!isPlaylist && recentAlbums.length > 0 && (
+                    <Box>
+                      {recentAlbums.map((album) => (
+                        <AlbumCard
+                          key={album.id}
+                          album={album}
+                          onClick={handleRecentAlbumClick}
+                        />
+                      ))}
+                    </Box>
+                  )}
+                </Box>
+                <Typography>
+                  {isPlaylist
+                    ? "enter a public spotify playlist id or url (on the spotify app, go to share -> copy link to playlist)"
+                    : "enter a spotify album id or url (on the spotify app, go to share -> copy link to album)"}
                 </Typography>
                 <TextField
-                  label="playlist ID or URL"
+                  label={isPlaylist ? "playlist ID or URL" : "album ID or URL"}
                   variant="outlined"
                   value={playlistIdInput}
                   onChange={(e) => setPlaylistIdInput(e.target.value)}
@@ -269,7 +345,7 @@ export default function MusicPlayer() {
                 />
                 <Button
                   variant="outlined"
-                  onClick={handleSubmit}
+                  onClick={isPlaylist ? handlePlaylistSubmit : handleAlbumSubmit}
                   sx={{
                     color: "white",
                     borderColor: "white",
@@ -287,7 +363,7 @@ export default function MusicPlayer() {
                     mt: 2,
                   }}
                 >
-                  connect playlist
+                  {isPlaylist ? "connect playlist" : "connect album"}
                 </Button>
               </Box>
             )}

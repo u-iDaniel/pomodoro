@@ -34,6 +34,37 @@ interface SimplifiedPlaylistObject {
   uri: string;
 }
 
+interface SimplifiedAlbumObject {
+  album_type: "album" | "single" | "compilation";
+  artists: Array<{
+    external_urls: {
+      spotify: string;
+    };
+    href: string;
+    id: string;
+    name: string;
+    type: string;
+    uri: string;
+  }>;
+  external_urls: {
+    spotify: string;
+  };
+  href: string;
+  id: string;
+  images: Array<{
+    height: number;
+    width: number;
+    url: string;
+  }>;
+  name: string;
+  popularity: number;
+  release_date: string; // YYYY-MM-DD
+  release_date_precision: "year" | "month" | "day";
+  total_tracks: number;
+  type: "album";
+  uri: string;
+}
+
 export async function getRandomSongByGenre(genre: string) {
   try {
     const accessToken = await getValidToken();
@@ -115,5 +146,21 @@ export async function getPlaylist(playlistId: string): Promise<SimplifiedPlaylis
     throw new Error(`Failed to fetch playlist: ${response.status} - ${await response.text()}`);
   }
 
+  return response.json();
+}
+
+export async function getAlbum(albumId: string): Promise<SimplifiedAlbumObject | { notFound: true }> {
+  const accessToken = await getValidToken();
+  const response = await fetch(`${SPOTIFY_API}/albums/${albumId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  if (!response.ok) {
+    if (response.status === 404) {
+      return { notFound: true };
+    }
+    throw new Error(`Failed to fetch album: ${response.status} - ${await response.text()}`);
+  }
   return response.json();
 }
