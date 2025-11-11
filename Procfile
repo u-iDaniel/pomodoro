@@ -1,1 +1,1 @@
-web: cd web && npm ci && npm run build && PORT=$PORT npm start
+web: cd web && PORT=$PORT npm start

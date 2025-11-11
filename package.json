@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "heroku-prebuild": "npm install --prefix web",
-    "heroku-postbuild": "npm run build --prefix web",
+    "heroku-postbuild": "npm prune --omit=dev --prefix web && npm run build --prefix web",
     "start": "npm start --prefix web"
   }
 }
