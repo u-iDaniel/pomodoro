@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     
     try {
       const response = await genAI.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemma-3-27b-it",
       contents: prompt,
     });
 
