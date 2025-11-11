@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import RootLayoutClient from "./layoutClient";
 import Script from "next/script";
+import AdSense from "@/components/AdSense";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -58,12 +59,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta
+          name="google-adsense-account"
+          content={process.env.ADSENSE_ID}
+        ></meta>
+        <AdSense />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <RootLayoutClient>{children}</RootLayoutClient>
       </body>
-      <Script defer src="https://analytics.pomoai.tech/script.js" data-website-id="e25f45c5-62fa-4bd4-a6dc-2cf4cd8eba0c"/>
+      <Script
+        defer
+        src="https://analytics.pomoai.tech/script.js"
+        data-website-id="e25f45c5-62fa-4bd4-a6dc-2cf4cd8eba0c"
+      />
     </html>
   );
 }
