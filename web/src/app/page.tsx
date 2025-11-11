@@ -27,6 +27,19 @@ export default function Home() {
       >
         <div>
           <Timer />
+          {!session?.user ? (
+            <div className="mt-10 text-center text-white">
+              want access to premium features like AI and music?{" "}
+              <Link
+                className="underline text-white decoration-white"
+                href={"/login"}
+              >
+                sign up
+              </Link>
+            </div>
+          ) : (
+            <div></div>
+          )}
         </div>
       </main>
       <div className="absolute top-[20%] right-5 w-[30%]">
@@ -38,15 +51,7 @@ export default function Home() {
           <MusicPlayer />
         </div>
       ) : (
-        <div className="text-center text-white">
-          want access to premium features like AI and music?{" "}
-          <Link
-            className="underline text-white decoration-white"
-            href={"/login"}
-          >
-            sign up
-          </Link>
-        </div>
+        <div></div>
       )}
     </div>
   );
