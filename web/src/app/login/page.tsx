@@ -3,7 +3,7 @@ import { signIn, useSession } from "next-auth/react";
 import GoogleIcon from "@mui/icons-material/Google";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import "@fontsource/montserrat/";
+import "@fontsource/montserrat";
 import "@fontsource/montserrat/300.css";
 
 export default function Login() {
