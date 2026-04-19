@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState, ChangeEvent } from "react";
+import { FC, useEffect, useState, ChangeEvent } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -15,6 +15,7 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { useSession } from "next-auth/react";
 import "@fontsource/montserrat/200.css";
 import PDFToText from "react-pdftotext";
+import { useTimer } from "./TimerContext";
 
 interface Task {
   id: number;
@@ -35,10 +36,25 @@ const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
 const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
   const { data: session } = useSession();
+  const { pomodoroTime } = useTimer();
   const [mode, setMode] = useState<"text" | "pdf">("text");
   const [generateText, setGenerateText] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingDots, setLoadingDots] = useState(1);
+
+  useEffect(() => {
+    if (!loading) {
+      setLoadingDots(1);
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      setLoadingDots((prev) => (prev % 3) + 1);
+    }, 350);
+
+    return () => clearInterval(intervalId);
+  }, [loading]);
 
   const deleteAllTasks = async () => {
     if (session?.user) {
@@ -79,13 +95,13 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
   };
 
   const generateResponse = async () => {
+    if (loading) return;
     setLoading(true);
     try {
       await deleteAllTasks();
-      const pomodoroTime = localStorage.getItem("pomodoroTime");
 
       const formData = new FormData();
-      formData.append("pomodoroTime", pomodoroTime || "");
+      formData.append("pomodoroTime", pomodoroTime || "25");
       formData.append("mode", mode);
       if (mode === "text") {
         formData.append("generateText", generateText);
@@ -104,6 +120,11 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
         alert(data.error);
         onClose();
         return;
+      }
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({ error: "Error generating tasks" }));
+        throw new Error(data.error || "Error generating tasks");
       }
 
       await loadData();
@@ -362,7 +383,7 @@ const Generate: FC<DialogComponentProps> = ({ open, onClose, setTasks }) => {
               },
             }}
           >
-            {loading ? "generating..." : "generate"}
+            {loading ? `generating${".".repeat(loadingDots)}` : "generate"}
           </Button>
         </DialogActions>
 
