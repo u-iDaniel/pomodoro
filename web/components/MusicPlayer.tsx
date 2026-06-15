@@ -98,7 +98,7 @@ export default function MusicPlayer() {
         const newRecentPlaylists = [
           playlistData,
           ...recentPlaylists.filter((p) => p.id !== id),
-        ].slice(0, 5);
+        ];
 
         setRecentPlaylists(newRecentPlaylists);
         localStorage.setItem(
@@ -127,7 +127,7 @@ export default function MusicPlayer() {
         const newRecentAlbums = [
           albumData,
           ...recentAlbums.filter((a) => a.id !== id),
-        ].slice(0, 5);
+        ];
         setRecentAlbums(newRecentAlbums);
         localStorage.setItem("recentAlbums", JSON.stringify(newRecentAlbums));
       } catch {
@@ -330,31 +330,63 @@ export default function MusicPlayer() {
                     </button>
                   </Box>
 
-                  {isPlaylist && recentPlaylists.length > 0 && (
-                    <Box>
-                      {recentPlaylists.map((playlist) => (
-                        <PlaylistCard
-                          key={playlist.id}
-                          playlist={playlist}
-                          onClick={handleRecentPlaylistClick}
-                          onDelete={handleDeletePlaylist}
-                        />
-                      ))}
-                    </Box>
-                  )}
+                  <Box 
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      maxHeight: "28rem",
+                      overflowY: "auto",
 
-                  {!isPlaylist && recentAlbums.length > 0 && (
-                    <Box>
-                      {recentAlbums.map((album) => (
-                        <AlbumCard
-                          key={album.id}
-                          album={album}
-                          onClick={handleRecentAlbumClick}
-                          onDelete={handleDeleteAlbum}
-                        />
-                      ))}
-                    </Box>
-                  )}
+                      // Custom scrollbar styles:
+                      // -- Firefox and Modern Browser --
+                      scrollbarWidth: "thin",
+                      scrollbarColor: "transparent transparent",
+                      scrollbarGutter: "stable",
+                      "&:hover": {
+                        scrollbarColor: "white transparent",
+                      },
+
+                      // -- WebKit Scrollbar (Chrome, Safari, Edge) --
+                      "&::-webkit-scrollbar": {
+                        width: "0.3rem", // Width of the scrollbar
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        backgroundColor: "transparent", // Background of the scrollbar track
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        backgroundColor: "transparent", // Hidden by default
+                        borderRadius: "4px", // Rounded corners for a modern look
+                      },
+                      "&:hover::-webkit-scrollbar-thumb": {
+                        backgroundColor: "white", // Becomes white when hovering over the Box
+                      },
+                    }}
+                  >
+                    {isPlaylist && recentPlaylists.length > 0 && (
+                      <Box>
+                        {recentPlaylists.map((playlist) => (
+                          <PlaylistCard
+                            key={playlist.id}
+                            playlist={playlist}
+                            onClick={handleRecentPlaylistClick}
+                            onDelete={handleDeletePlaylist}
+                          />
+                        ))}
+                      </Box>
+                    )}
+                    {!isPlaylist && recentAlbums.length > 0 && (
+                      <Box>
+                        {recentAlbums.map((album) => (
+                          <AlbumCard
+                            key={album.id}
+                            album={album}
+                            onClick={handleRecentAlbumClick}
+                            onDelete={handleDeleteAlbum}
+                          />
+                        ))}
+                      </Box>
+                    )}
+                  </Box>
                 </Box>
                 <Typography>
                   {isPlaylist
