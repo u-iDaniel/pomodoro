@@ -5,10 +5,16 @@ import {
   TextField,
   IconButton,
   Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
 } from "@mui/material";
 import HeadphonesIcon from "@mui/icons-material/Headphones";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import CloseIcon from "@mui/icons-material/Close";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -18,7 +24,7 @@ import AlbumCard from "./AlbumCard";
 interface Playlist {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   images: { url: string }[];
 }
 
@@ -26,10 +32,14 @@ interface Album {
   id: string;
   name: string;
   images: { url: string }[];
-  release_date: string;
-  popularity: number;
+  release_date?: string;
+  popularity?: number;
   artists: { name: string }[];
 }
+
+type DeleteTarget =
+  | { kind: "playlist"; id: string; name: string }
+  | { kind: "album"; id: string; name: string };
 
 export default function MusicPlayer() {
   const { data: session } = useSession();
@@ -42,6 +52,7 @@ export default function MusicPlayer() {
   const [recentPlaylists, setRecentPlaylists] = useState<Playlist[]>([]);
   const [recentAlbums, setRecentAlbums] = useState<Album[]>([]);
   const [isPlaylist, setIsPlaylist] = useState<boolean>(true); // determine if user wants playlist or album
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
 
   useEffect(() => {
     const storedPlaylists = localStorage.getItem("recentPlaylists");
@@ -82,25 +93,18 @@ export default function MusicPlayer() {
         }
         const playlistData = await response.json();
 
-        if (playlistData.notFound) {
-          alert(
-            "The playlist was potentially not found. If it was a Spotify account playlist, it should still work."
-          );
-          setSubmittedPlaylistId(id);
-        } else {
-          setSubmittedPlaylistId(id);
+        setSubmittedPlaylistId(id);
 
-          const newRecentPlaylists = [
-            playlistData,
-            ...recentPlaylists.filter((p) => p.id !== id),
-          ].slice(0, 5);
+        const newRecentPlaylists = [
+          playlistData,
+          ...recentPlaylists.filter((p) => p.id !== id),
+        ].slice(0, 5);
 
-          setRecentPlaylists(newRecentPlaylists);
-          localStorage.setItem(
-            "recentPlaylists",
-            JSON.stringify(newRecentPlaylists)
-          );
-        }
+        setRecentPlaylists(newRecentPlaylists);
+        localStorage.setItem(
+          "recentPlaylists",
+          JSON.stringify(newRecentPlaylists)
+        );
       } catch {
         alert("Invalid Spotify Playlist URL or ID");
       }
@@ -118,18 +122,14 @@ export default function MusicPlayer() {
           throw new Error("Album not found");
         }
         const albumData = await response.json();
-        if (albumData.notFound) {
-          alert("The album was potentially not found.");
-          setSubmittedPlaylistId(id);
-        } else {
-          setSubmittedPlaylistId(id);
-          const newRecentAlbums = [
-            albumData,
-            ...recentAlbums.filter((a) => a.id !== id),
-          ].slice(0, 5);
-          setRecentAlbums(newRecentAlbums);
-          localStorage.setItem("recentAlbums", JSON.stringify(newRecentAlbums));
-        }
+
+        setSubmittedPlaylistId(id);
+        const newRecentAlbums = [
+          albumData,
+          ...recentAlbums.filter((a) => a.id !== id),
+        ].slice(0, 5);
+        setRecentAlbums(newRecentAlbums);
+        localStorage.setItem("recentAlbums", JSON.stringify(newRecentAlbums));
       } catch {
         alert("Invalid Spotify Album URL or ID");
       }
@@ -151,6 +151,50 @@ export default function MusicPlayer() {
   const handleRecentAlbumClick = (id: string) => {
     setIsPlaylist(false);
     setSubmittedPlaylistId(id);
+  };
+
+  const handleDeletePlaylist = (id: string) => {
+    const target = recentPlaylists.find((playlist) => playlist.id === id);
+    if (!target) {
+      return;
+    }
+
+    setDeleteTarget({ kind: "playlist", id, name: target.name });
+  };
+
+  const handleDeleteAlbum = (id: string) => {
+    const target = recentAlbums.find((album) => album.id === id);
+    if (!target) {
+      return;
+    }
+
+    setDeleteTarget({ kind: "album", id, name: target.name });
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) {
+      return;
+    }
+
+    if (deleteTarget.kind === "playlist") {
+      const updatedPlaylists = recentPlaylists.filter(
+        (playlist) => playlist.id !== deleteTarget.id
+      );
+      setRecentPlaylists(updatedPlaylists);
+      localStorage.setItem("recentPlaylists", JSON.stringify(updatedPlaylists));
+    } else {
+      const updatedAlbums = recentAlbums.filter(
+        (album) => album.id !== deleteTarget.id
+      );
+      setRecentAlbums(updatedAlbums);
+      localStorage.setItem("recentAlbums", JSON.stringify(updatedAlbums));
+    }
+
+    if (submittedPlaylistId === deleteTarget.id) {
+      setSubmittedPlaylistId(null);
+    }
+
+    setDeleteTarget(null);
   };
 
   return (
@@ -293,6 +337,7 @@ export default function MusicPlayer() {
                           key={playlist.id}
                           playlist={playlist}
                           onClick={handleRecentPlaylistClick}
+                          onDelete={handleDeletePlaylist}
                         />
                       ))}
                     </Box>
@@ -305,6 +350,7 @@ export default function MusicPlayer() {
                           key={album.id}
                           album={album}
                           onClick={handleRecentAlbumClick}
+                          onDelete={handleDeleteAlbum}
                         />
                       ))}
                     </Box>
@@ -395,6 +441,68 @@ export default function MusicPlayer() {
           </Box>
         )}
       </Collapse>
+      <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)}>
+        <DialogActions sx={{ backgroundColor: "white", color: "black" }}>
+          <IconButton aria-label="Close delete dialog" onClick={() => setDeleteTarget(null)}>
+            <CloseIcon sx={{ color: "black" }} />
+          </IconButton>
+        </DialogActions>
+        <DialogTitle
+          sx={{
+            textAlign: "center",
+            backgroundColor: "white",
+            color: "black",
+            padding: "0px",
+            fontFamily: "Montserrat, Arial, sans-serif",
+            fontWeight: "bold",
+            fontSize: "1.25rem",
+          }}
+        >
+          delete {deleteTarget?.kind}
+        </DialogTitle>
+        <Divider sx={{ backgroundColor: "rgba(0,0,0,0.1)" }} />
+        <DialogContent sx={{ backgroundColor: "white", color: "black", width: "32rem" }}>
+          <Typography sx={{ color: "black" }}>
+            are you sure you want to delete {deleteTarget?.name}?
+          </Typography>
+          <DialogActions sx={{ justifyContent: "flex-end", mt: 2 }}>
+            <Button
+              onClick={() => setDeleteTarget(null)}
+              variant="outlined"
+              sx={{
+                px: 2,
+                py: 1,
+                borderWidth: "2px",
+                borderColor: "black",
+                color: "black",
+                fontWeight: "bold",
+                backgroundColor: "white",
+                borderRadius: "1rem",
+                textTransform: "none",
+              }}
+            >
+              cancel
+            </Button>
+            <Button
+              onClick={confirmDelete}
+              variant="outlined"
+              sx={{
+                px: 2,
+                py: 1,
+                borderWidth: "2px",
+                borderColor: "black",
+                color: "black",
+                fontWeight: "bold",
+                backgroundColor: "white",
+                borderRadius: "1rem",
+                textTransform: "none",
+              }}
+            >
+              delete
+            </Button>
+          </DialogActions>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

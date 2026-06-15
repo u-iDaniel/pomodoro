@@ -1,18 +1,20 @@
-import { Box, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 interface AlbumCardProps {
   album: {
     id: string;
     name: string;
-    popularity: number;
-    release_date: string; // YYYY or YYYY-MM or YYYY-MM-DD
+    popularity?: number;
+    release_date?: string; // YYYY or YYYY-MM or YYYY-MM-DD
     images: { url: string }[];
     artists: { name: string }[];
   };
   onClick: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
-export default function AlbumCard({ album, onClick }: AlbumCardProps) {
+export default function AlbumCard({ album, onClick, onDelete }: AlbumCardProps) {
   const year = album.release_date
     ? new Date(album.release_date).getFullYear() || album.release_date
     : undefined;
@@ -26,10 +28,16 @@ export default function AlbumCard({ album, onClick }: AlbumCardProps) {
         alignItems: "center",
         gap: 2,
         p: 1,
+        pr: onDelete ? 6 : 1,
+        position: "relative",
         borderRadius: "8px",
         cursor: "pointer",
         "&:hover": {
           backgroundColor: "rgba(255, 255, 255, 0.1)",
+          "& .album-delete-button": {
+            opacity: 1,
+            pointerEvents: "auto",
+          },
         },
       }}
     >
@@ -59,6 +67,28 @@ export default function AlbumCard({ album, onClick }: AlbumCardProps) {
           </Typography>
         )}
       </Box>
+      {onDelete && (
+        <IconButton
+          className="album-delete-button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete(album.id);
+          }}
+          aria-label={`Delete ${album.name}`}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: "rgba(255, 255, 255, 0.8)",
+            opacity: 0,
+            pointerEvents: "none",
+            transition: "opacity 0.2s ease",
+          }}
+        >
+          <DeleteOutlineIcon fontSize="small" />
+        </IconButton>
+      )}
     </Box>
   );
 }
